@@ -16,18 +16,49 @@ change server policy.
 - Trigger only after an explicit onboarding, setup, migration, connection-diagnosis, or self-check
   request. A company question, bare Plugin invocation, or query failure must not start a write
   rehearsal.
-- Explain that installation or Plugin updates require a new conversation before a reliable check.
-  Inspect only the current Plugin version and the dedicated MCP tool surface; do not install,
-  upgrade, distribute, or edit marketplace/workspace settings without separate approval.
+- Explain that installation, Plugin updates, or first-time MCP login require a full Codex restart
+  and a new conversation before a reliable tool check. Inspect only the current Plugin version and
+  dedicated MCP host status; do not install, upgrade, distribute, authenticate, or edit
+  marketplace/workspace settings without the employee's explicit request or approval.
 - P0 checks no GitHub, Figma, Feishu, Azure, Google, Slack, or other third-party connection and must
   not request per-platform OAuth. SharePoint access is mediated by the dedicated Company MCP; do
   not bypass it with a direct employee connector.
 
+## OAuth bootstrap
+
+Run this bootstrap before evaluating any required gate. The host can withhold protected MCP tools
+until the server is authenticated, so the workflow must not fail `MCP_TOOL_SURFACE` before offering
+the employee OAuth path.
+
+1. Run the local, read-only `codex mcp list` status check and inspect only the row for
+   `company_knowledge_assistant`.
+2. If the server is absent or disabled, stop with `host_binding_missing` or
+   `host_binding_disabled`. Do not substitute SharePoint or another MCP.
+3. If the server is enabled and reports `Not logged in`, explain that
+   `codex mcp login company_knowledge_assistant` opens the Microsoft authorization flow for this
+   dedicated MCP. Run it only when the employee's current installation/onboarding request already
+   authorizes first-time login or after obtaining explicit approval. The employee completes the
+   Microsoft browser flow using their own `@memova.ai` account; never operate the identity-provider
+   page for them.
+4. Yield control while the employee enters any password or MFA only on Microsoft's page. Never ask
+   them to copy any credential, code, token, cookie, URL query, or callback content into Codex.
+   `codex mcp logout company_knowledge_assistant` is the local connection rollback.
+5. After the employee reports completion, run `codex mcp list` again. If it still reports
+   `Not logged in`, stop with `oauth_login_incomplete` and the exact retry command; do not loop or
+   reinstall. If authenticated, require the employee to fully quit and reopen Codex and start a new
+   conversation. The current run remains incomplete because its tool surface was created before
+   login.
+6. In the fresh conversation, if the server is authenticated but the seven required tools are
+   still absent, fail with `authenticated_host_binding_missing`. Only an authenticated server with
+   the exact seven tools may continue to the required gates.
+
 ## Authentication and profile
 
-1. Verify that the current session exposes the exact required Company MCP tools from the contract.
-   Missing or unexpected tools fail the relevant gate; never substitute another endpoint.
-2. Call `get_profile`. The host may open the Microsoft authorization-code login and consent flow.
+1. After the OAuth bootstrap, verify that the current session exposes the exact required Company
+   MCP tools from the contract. Missing or unexpected tools fail the relevant gate; never
+   substitute another endpoint.
+2. Call `get_profile`. If the host unexpectedly requires Microsoft authorization again, return to
+   the bounded bootstrap classification instead of assuming that a tool call will open login.
    Never ask the employee to paste or dictate a password, access/refresh token, cookie, client
    secret, private key, MFA code, recovery code, or session export. Never place any such value in a
    tool argument, file, log, report, or conversation summary. If one appears, stop handling it and

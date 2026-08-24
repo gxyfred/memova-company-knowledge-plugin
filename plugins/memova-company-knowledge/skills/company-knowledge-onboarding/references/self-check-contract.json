@@ -1,6 +1,6 @@
 {
-  "contract_version": "1.0",
-  "plugin_version": "0.4.0",
+  "contract_version": "1.1",
+  "plugin_version": "0.4.1",
   "mcp_server": "company_knowledge_assistant",
   "required_tools": [
     "get_profile",
@@ -26,6 +26,22 @@
     "not_run",
     "not_applicable"
   ],
+  "oauth_bootstrap": {
+    "runs_before_required_gates": true,
+    "status_command": "codex mcp list",
+    "login_command": "codex mcp login company_knowledge_assistant",
+    "logout_command": "codex mcp logout company_knowledge_assistant",
+    "login_actor": "employee_completes_microsoft_browser_login",
+    "credential_handling": "never_request_capture_print_or_persist_credentials",
+    "restart_after_login": "fully_restart_codex_then_start_new_conversation",
+    "states": {
+      "server_absent": "stop_with_host_binding_missing",
+      "server_disabled": "stop_with_host_binding_disabled",
+      "not_logged_in": "launch_employee_oauth_then_recheck_status",
+      "authenticated_tools_missing": "stop_with_authenticated_host_binding_missing",
+      "authenticated_required_tools_present": "continue_to_required_gates"
+    }
+  },
   "retry_policy": {
     "maximum_total_attempts": 3,
     "maximum_additional_retries": 2,
@@ -57,7 +73,7 @@
       "id": "INSTALL_VERSION",
       "required": true,
       "mode": "local",
-      "pass_condition": "plugin_version_is_0_4_0_or_newer"
+      "pass_condition": "plugin_version_is_0_4_1_or_newer"
     },
     {
       "id": "FRESH_SESSION",
@@ -68,8 +84,8 @@
     {
       "id": "MCP_TOOL_SURFACE",
       "required": true,
-      "mode": "read_only",
-      "pass_condition": "only_dedicated_server_exposes_all_required_tools"
+      "mode": "host_after_oauth_bootstrap",
+      "pass_condition": "authenticated_dedicated_server_exposes_all_required_tools"
     },
     {
       "id": "MICROSOFT_OAUTH_PROFILE",
