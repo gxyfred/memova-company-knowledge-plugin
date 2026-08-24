@@ -1,7 +1,12 @@
 {
   "contract_version": "1.0",
-  "plugin_version": "0.4.1",
+  "plugin_version": "0.4.2",
   "mcp_server": "company_knowledge_assistant",
+  "candidate_contract": {
+    "schema": "references/receipt-candidate-v1.schema.json",
+    "source_of_truth": "packages/contracts/v1/submission-receipt-v1.schema.json#/$defs/ReceiptCandidateV1",
+    "dereferenced": true
+  },
   "required_tools": [
     "get_profile",
     "prepare_knowledge_submission",

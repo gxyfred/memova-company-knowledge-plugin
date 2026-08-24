@@ -6,9 +6,10 @@ description: Check and explicitly submit current-task knowledge to Memova's comp
 # Company Knowledge Submit
 
 Provide the P0 employee-initiated submission workflow through the dedicated
-`company_knowledge_assistant` MCP. Before assessing candidates, read both
-`references/submission-workflow-contract.json` and `references/trigger-routing-v1.json`. Treat their
-outcomes, gate order, receipt routes, trigger IDs, exclusion rules, approval boundaries, and stop
+`company_knowledge_assistant` MCP. Before assessing candidates, read
+`references/submission-workflow-contract.json`, `references/trigger-routing-v1.json`, and
+`references/receipt-candidate-v1.schema.json`. Treat their outcomes, gate order, receipt routes,
+candidate fields, enum values, trigger IDs, exclusion rules, approval boundaries, and stop
 conditions as authoritative. The Company MCP remains authoritative for identity, capabilities,
 source/target registries, validation, idempotency, audit, publication, and index state.
 
@@ -59,9 +60,13 @@ source/target registries, validation, idempotency, audit, publication, and index
 - Correction and source-invalid cases inherit the original receipt type and require
   `previous_receipt_id`, `supersedes_knowledge_id`, and a substantive correction reason. Create a
   forward superseding record; never edit, overwrite, hide, or delete history.
-- Construct one `ReceiptCandidateV1` from the selected bounded evidence. Never expose employee IDs,
-  ACLs, arbitrary targets, hidden server fields, or raw sensitive material. Process multiple
-  candidates sequentially, each with its own preview and confirmation.
+- Construct one `ReceiptCandidateV1` from the selected bounded evidence using only the fields,
+  required sets, formats, and enum values in `references/receipt-candidate-v1.schema.json`. Do not
+  guess missing fields, source identifiers, locators, revisions, hashes, or evidence-manifest
+  values. If the current task cannot supply a fully valid candidate, stop at `NEED_MORE_EVIDENCE`
+  before asking for prepare approval. Never expose employee IDs, ACLs, arbitrary targets, hidden
+  server fields, or raw sensitive material. Process multiple candidates sequentially, each with its
+  own preview and confirmation.
 
 ## Approval-gated preparation
 

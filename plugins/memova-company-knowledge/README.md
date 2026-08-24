@@ -11,4 +11,7 @@ Plugin 不保存 Microsoft 或 GitHub 密码、Token，不包含员工/职位白
 Microsoft OAuth。登录完成后必须完全重启 Codex 并新建任务，再执行七工具和身份自检。Plugin 不
 接收密码、MFA、Token、Cookie 或回调内容。
 
+版本 `0.4.2` 为发布预览增加与后端一致的完整 `ReceiptCandidateV1` 机器契约。提交 Skill 只按该
+契约构造候选；校验失败时后端返回安全字段路径，不回显被拒绝内容，也不要求猜测服务端字段。
+
 发布仍使用员工本人委托身份。安装与升级说明见仓库根目录 `README.md`。
