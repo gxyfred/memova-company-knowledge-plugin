@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "company_knowledge_assistant": {
+      "type": "http",
+      "url": "https://ca-memova-ckp-pilot-jpe-gateway.kindrock-3055a13d.japaneast.azurecontainerapps.io/mcp",
+      "note": "Dedicated Memova company-knowledge OAuth MCP. Authentication, employee resolution, authorization, audit, citation, freshness, and write eligibility are enforced by the server."
+    }
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "contract_version": "1.0",
+  "plugin_version": "0.4.0",
+  "mcp_server": "company_knowledge_assistant",
+  "required_tools": [
+    "get_profile",
+    "prepare_knowledge_submission",
+    "submit_knowledge_candidate",
+    "get_publication_status"
+  ],
+  "explicit_invocation": {
+    "accepted": [
+      "@公司知识助手 with an explicit current-task check request",
+      "a clear request to submit or publish explicitly selected evidence"
+    ],
+    "assessment_is_prepare_approval": false,
+    "assessment_is_publish_confirmation": false,
+    "bare_mention_is_sufficient": false
+  },
+  "default_candidate_limit": 3,
+  "one_receipt_type_per_candidate": true,
+  "process_candidates_sequentially": true,
+  "decision_outcomes": [
+    "PREPARE_NOW",
+    "PREPARE_BEFORE_TASK_END",
+    "CORRECTION_REQUIRED",
+    "NEED_MORE_EVIDENCE",
+    "SENSITIVE_OR_RESTRICTED",
+    "NO_SUBMIT"
+  ],
+  "common_gates": [
+    "material_change",
+    "reusable_or_cross_role_value",
+    "evidence_complete",
+    "company_public_internal",
+    "employee_selected_candidate"
+  ],
+  "evidence_scope": {
+    "allowed": "current_task_plus_employee_explicit_selection_only",
+    "full_conversation_default": false,
+    "arbitrary_workspace_scan": false,
+    "third_party_oauth_required": false,
+    "background_collection": false
+  },
+  "prepare": {
+    "tool": "prepare_knowledge_submission",
+    "remote_effect": "employee_owned_ephemeral_preview",
+    "preview_ttl_minutes": 30,
+    "exact_approval_required": true,
+    "maximum_calls_per_approval": 1,
+    "creates_published_knowledge": false,
+    "cancel": "do_not_submit_and_allow_preview_to_expire"
+  },
+  "submit": {
+    "tool": "submit_knowledge_candidate",
+    "separate_confirmation_required": true,
+    "accepted_fields": [
+      "client_request_id",
+      "preview_id",
+      "preview_payload_sha256",
+      "user_confirmed"
+    ],
+    "candidate_payload_accepted": false,
+    "maximum_calls_per_confirmation": 1,
+    "effect": "direct_published_knowledge_plus_immutable_receipt",
+    "human_review_queue": false
+  },
+  "status": {
+    "tool": "get_publication_status",
+    "read_only": true,
+    "maximum_checks": 3,
+    "maximum_elapsed_seconds": 60,
+    "index_pending_is_visible": false
+  },
+  "retry_policy": {
+    "prepare_automatic_retries": 0,
+    "submit_automatic_retries": 0,
+    "unknown_submit_outcome": "preserve_operation_id_and_check_status_never_blind_retry",
+    "changed_preview": "obtain_new_prepare_approval_and_prepare_again"
+  },
+  "correction": {
+    "inherits_original_receipt_type": true,
+    "required_fields": [
+      "previous_receipt_id",
+      "supersedes_knowledge_id",
+      "correction_reason"
+    ],
+    "history_preserved": true,
+    "delete_or_overwrite": false
+  },
+  "completion_states": [
+    "no_submit",
+    "needs_more_evidence",
+    "sensitive_or_restricted",
+    "preview_cancelled",
+    "preview_expired",
+    "published_visible",
+    "published_index_pending",
+    "publication_recovery_required"
+  ],
+  "state_transitions": [
+    "idle->assessed",
+    "assessed->candidate_selected",
+    "candidate_selected->prepare_approved",
+    "prepare_approved->preview_ready",
+    "preview_ready->preview_cancelled",
+    "preview_ready->submit_confirmed",
+    "submit_confirmed->published_visible",
+    "submit_confirmed->published_index_pending",
+    "submit_confirmed->publication_recovery_required"
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "contract_version": "1.0",
+  "plugin_version": "0.4.0",
+  "mcp_server": "company_knowledge_assistant",
+  "required_tools": [
+    "get_profile",
+    "answer",
+    "search",
+    "fetch",
+    "prepare_knowledge_submission",
+    "submit_knowledge_candidate",
+    "get_publication_status"
+  ],
+  "receipt_types": [
+    "general_knowledge",
+    "code_change",
+    "business_status",
+    "document_or_meeting",
+    "file_or_media",
+    "design_change",
+    "deployment_or_incident"
+  ],
+  "statuses": [
+    "pass",
+    "fail",
+    "not_run",
+    "not_applicable"
+  ],
+  "retry_policy": {
+    "maximum_total_attempts": 3,
+    "maximum_additional_retries": 2,
+    "retryable": [
+      "transient_network",
+      "transient_dependency",
+      "connection_interrupted"
+    ],
+    "non_retryable": [
+      "unauthorized_employee",
+      "application_disabled_by_admin",
+      "wrong_tenant",
+      "missing_site_permission",
+      "identity_mismatch",
+      "admin_consent_required",
+      "policy_denied"
+    ]
+  },
+  "remote_mutation_boundaries": {
+    "profile_and_query": "read_only",
+    "prepare_knowledge_submission": "ephemeral_remote_state_requires_exact_approval",
+    "submit_knowledge_candidate": "durable_remote_write_requires_separate_exact_approval",
+    "cancel": "do_not_submit_and_allow_preview_to_expire",
+    "preview_ttl_minutes": 30,
+    "rollback": "forward_correction_or_recovery_never_delete"
+  },
+  "gates": [
+    {
+      "id": "INSTALL_VERSION",
+      "required": true,
+      "mode": "local",
+      "pass_condition": "plugin_version_is_0_4_0_or_newer"
+    },
+    {
+      "id": "FRESH_SESSION",
+      "required": true,
+      "mode": "host",
+      "pass_condition": "new_conversation_started_after_install_or_update"
+    },
+    {
+      "id": "MCP_TOOL_SURFACE",
+      "required": true,
+      "mode": "read_only",
+      "pass_condition": "only_dedicated_server_exposes_all_required_tools"
+    },
+    {
+      "id": "MICROSOFT_OAUTH_PROFILE",
+      "required": true,
+      "mode": "read_only",
+      "pass_condition": "get_profile_succeeds_with_delegated_employee_identity"
+    },
+    {
+      "id": "SELF_IDENTITY_MATCH",
+      "required": true,
+      "mode": "user_confirmation",
+      "pass_condition": "employee_confirms_safe_profile_is_their_own"
+    },
+    {
+      "id": "JOB_AND_CAPABILITY_RESOLUTION",
+      "required": true,
+      "mode": "read_only",
+      "pass_condition": "job_is_explanatory_and_explicit_capabilities_are_authoritative"
+    },
+    {
+      "id": "SEVEN_RECEIPT_TYPES",
+      "required": true,
+      "mode": "read_only",
+      "pass_condition": "all_frozen_receipt_types_are_declared_and_live_support_is_not_overclaimed"
+    },
+    {
+      "id": "QUERY_AND_SNAPSHOT",
+      "required": true,
+      "mode": "read_only",
+      "pass_condition": "answer_probe_preserves_citations_conflicts_gaps_policy_and_snapshot_labels"
+    },
+    {
+      "id": "PREVIEW_CANCEL",
+      "required": true,
+      "mode": "approval_gated_ephemeral_write",
+      "pass_condition": "employee_previews_under_own_delegated_identity_then_does_not_submit"
+    },
+    {
+      "id": "CONFIRM_DELEGATED_PUBLICATION",
+      "required": true,
+      "mode": "approval_gated_durable_write",
+      "pass_condition": "employee_separately_approves_confirm_and_sharepoint_receipt_submitter_match_own_identity"
+    },
+    {
+      "id": "PERMISSION_NEGATIVE",
+      "required": true,
+      "mode": "synthetic_negative",
+      "pass_condition": "server_denies_cross_employee_or_unauthorized_target_access"
+    },
+    {
+      "id": "SENSITIVE_DATA_NEGATIVE",
+      "required": true,
+      "mode": "synthetic_negative",
+      "pass_condition": "inert_secret_and_personal_data_markers_are_rejected_or_excluded"
+    },
+    {
+      "id": "NO_THIRD_PARTY_OAUTH",
+      "required": true,
+      "mode": "local",
+      "pass_condition": "p0_requests_no_third_party_connection_or_oauth"
+    },
+    {
+      "id": "NO_CREDENTIAL_CAPTURE",
+      "required": true,
+      "mode": "local",
+      "pass_condition": "workflow_never_requests_or_persists_credentials_tokens_cookies_or_mfa"
+    }
+  ],
+  "employee_completion": {
+    "PREVIEW_CANCEL": "pass_only_after_exact_preview_approval_and_no_submit",
+    "CONFIRM_DELEGATED_PUBLICATION": "pass_only_after_separate_exact_confirmation_and_submitter_identity_readback"
+  },
+  "completion_rule": "all_required_gates_pass; not_run_is_incomplete; withheld_remote_approval_is_incomplete_not_failed",
+  "sensitive_test_markers": [
+    "SYNTHETIC_PASSWORD_MARKER",
+    "SYNTHETIC_TOKEN_MARKER",
+    "SYNTHETIC_COOKIE_MARKER",
+    "SYNTHETIC_MFA_MARKER",
+    "SYNTHETIC_PERSONAL_DATA_MARKER"
+  ]
+}

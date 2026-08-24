@@ -1,0 +1,100 @@
+{
+  "policy_version": "1.0",
+  "source_policy": {
+    "role": "frozen_master_prd_s3_04_derived_summary",
+    "sha256": "eb29b5cacf68f8b09f561073fb7bb66ed3afb9bca72403f8aa13ff02006981e0"
+  },
+  "no_automatic_publish_on": [
+    "task_end",
+    "commit",
+    "merge",
+    "meeting_end",
+    "deployment",
+    "file_change",
+    "third_party_event"
+  ],
+  "receipt_routes": [
+    {
+      "receipt_type": "code_change",
+      "collector_semantics": "allowlisted_local_git_revision",
+      "hard_boundary": "code_and_tests_do_not_prove_deployment"
+    },
+    {
+      "receipt_type": "design_change",
+      "collector_semantics": "allowlisted_approved_design_export",
+      "hard_boundary": "design_intent_does_not_prove_implementation"
+    },
+    {
+      "receipt_type": "document_or_meeting",
+      "collector_semantics": "allowlisted_confirmed_export_or_bounded_attestation",
+      "hard_boundary": "raw_transcript_or_unconfirmed_summary_is_not_publishable"
+    },
+    {
+      "receipt_type": "deployment_or_incident",
+      "collector_semantics": "allowlisted_sanitized_runtime_evidence",
+      "hard_boundary": "environment_revision_status_and_health_or_recovery_are_required"
+    },
+    {
+      "receipt_type": "business_status",
+      "collector_semantics": "explicit_current_task_status_fields",
+      "hard_boundary": "discussion_development_merge_test_deployment_and_user_availability_are_distinct"
+    },
+    {
+      "receipt_type": "file_or_media",
+      "collector_semantics": "allowlisted_selected_file_with_hash_rights_and_safety",
+      "hard_boundary": "no_directory_copy_or_unknown_publication_rights"
+    },
+    {
+      "receipt_type": "general_knowledge",
+      "collector_semantics": "explicit_current_task_knowledge_fields",
+      "hard_boundary": "scope_evidence_owner_and_review_or_expiry_are_required"
+    }
+  ],
+  "trigger_catalog": [
+    ["T-DEC-01", "document_or_meeting", "confirmed formal decision"],
+    ["T-DEC-02", "general_knowledge", "scope priority acceptance or non-goal changed"],
+    ["T-STS-01", "business_status", "delivery stage materially changed"],
+    ["T-STS-02", "business_status", "completion acceptance handoff or blocker changed"],
+    ["T-CODE-01", "code_change", "reusable code change verified"],
+    ["T-CODE-02", "code_change", "API schema config migration compatibility or fix closed"],
+    ["T-DSN-01", "design_change", "design version approved for implementation"],
+    ["T-DSN-02", "design_change", "design behavior content privacy or flow changed"],
+    ["T-DEP-01", "deployment_or_incident", "deployment rollback or hotfix with health evidence"],
+    ["T-INC-01", "deployment_or_incident", "incident impact mitigation or resolution changed"],
+    ["T-MTG-01", "document_or_meeting", "meeting produced decision action or explicit no-decision"],
+    ["T-RES-01", "document_or_meeting", "research interview or test produced reusable evidence"],
+    ["T-FILE-01", "file_or_media", "canonical file or media approved published or versioned"],
+    ["T-FILE-02", "file_or_media", "multi-platform content published or platform exception changed"],
+    ["T-CUS-01", "document_or_meeting", "authorized customer or partner commitment changed"],
+    ["T-EXT-01", "general_knowledge", "external claim pitch FAQ or positioning approved or withdrawn"],
+    ["T-POL-01", "general_knowledge", "policy SOP or process became effective or changed"],
+    ["T-GOV-01", "general_knowledge", "canonical source path owner backup or lifecycle changed"],
+    ["T-SEC-01", "general_knowledge", "data privacy permission or publication boundary changed"],
+    ["T-KNW-01", "general_knowledge", "method checklist troubleshooting or optimization verified"],
+    ["T-KNW-02", "general_knowledge", "repeated problem or knowledge gap reliably resolved"],
+    ["T-BIZ-01", "business_status", "business campaign or operations milestone changed"],
+    ["T-BIZ-02", "general_knowledge", "platform rule operating method or exception stabilized"],
+    ["T-COR-01", "inherit_original_receipt_type", "published fact is wrong stale or duplicated"],
+    ["T-SRC-01", "inherit_original_receipt_type", "source deleted revoked unreadable or no longer public"]
+  ],
+  "no_submit_rules": [
+    ["NS-01", "NO_SUBMIT", "task ended without a new fact"],
+    ["NS-02", "NO_SUBMIT", "state is identical to the current Published record"],
+    ["NS-03", "NO_SUBMIT", "brainstorm draft or unconfirmed suggestion"],
+    ["NS-04", "NEED_MORE_EVIDENCE", "only an account email or private link exists"],
+    ["NS-05", "NEED_MORE_EVIDENCE", "source object is not currently readable"],
+    ["NS-06", "NEED_MORE_EVIDENCE", "uncommitted code is described as complete"],
+    ["NS-07", "NEED_MORE_EVIDENCE", "commit or merge is described as deployed"],
+    ["NS-08", "NEED_MORE_EVIDENCE", "CI or portal success lacks environment revision or health"],
+    ["NS-09", "NO_SUBMIT", "meeting has no decision action or reusable conclusion"],
+    ["NS-10", "NO_SUBMIT", "customer or partner commitment is unauthorized"],
+    ["NS-11", "NEED_MORE_EVIDENCE", "file lacks hash version publication rights or safety"],
+    ["NS-12", "SENSITIVE_OR_RESTRICTED", "full repository platform directory chat or history"],
+    ["NS-13", "SENSITIVE_OR_RESTRICTED", "secret token cookie MFA connection string or credential"],
+    ["NS-14", "SENSITIVE_OR_RESTRICTED", "PII private message or restricted HR finance health interview"],
+    ["NS-15", "SENSITIVE_OR_RESTRICTED", "media copyright customer license or person consent unknown"],
+    ["NS-16", "NO_SUBMIT", "personal temporary task or note"],
+    ["NS-17", "NO_SUBMIT", "format or wording change without behavioral or semantic change"],
+    ["NS-18", "NO_SUBMIT", "employee did not inspect and confirm the preview"]
+  ]
+}

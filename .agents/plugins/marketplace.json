@@ -1,0 +1,20 @@
+{
+  "name": "memova-company-knowledge-pilot",
+  "interface": {
+    "displayName": "Memova Company Knowledge Pilot"
+  },
+  "plugins": [
+    {
+      "name": "memova-company-knowledge",
+      "source": {
+        "source": "local",
+        "path": "./plugins/memova-company-knowledge"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
