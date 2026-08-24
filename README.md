@@ -1,13 +1,13 @@
-# Memova 公司知识助手（私有分发）
+# Memova 公司知识助手（公开分发）
 
-本私有仓库只分发公司知识助手 Plugin 和 Codex Marketplace 元数据，不包含后端代码、
+本公开仓库只分发公司知识助手 Plugin 和 Codex Marketplace 元数据，不包含后端代码、
 生产凭证或公司知识数据。
 
 ## 最简单的员工安装方式
 
-管理员先给员工的 GitHub 账号授予本私有仓库只读权限。员工随后把
-[`INSTALL_PROMPT.md`](INSTALL_PROMPT.md) 中整段文字复制给自己的 Codex，让 Codex
-完成检查与安装。员工不需要理解 `git clone`。
+员工把 [`INSTALL_PROMPT.md`](INSTALL_PROMPT.md) 中整段文字复制给自己的 Codex，
+让 Codex 完成安装和验证。仓库可以匿名只读访问，不要求员工登录 GitHub，也不需要理解
+`git clone`。
 
 安装完成后需要完全退出并重新打开 Codex，再新建一个任务并发送：
 
