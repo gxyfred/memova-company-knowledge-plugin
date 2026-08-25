@@ -1,17 +1,60 @@
 # 公司知识助手 Plugin
 
-这是 Memova 公司公共知识库的独立薄 Plugin。它只包含查询、入职自检、显式提交 Skill
-和 `company_knowledge_assistant` MCP 连接声明；身份、权限、审计、发布、检索、引用与
-新鲜度全部由公司服务端执行。
+This is the independent, thin Plugin package for the Memova Company Knowledge Platform. The
+authoritative product decisions remain in the Obsidian Master PRD; this directory is a derived
+installable artifact.
 
-Plugin 不保存 Microsoft 或 GitHub 密码、Token，不包含员工/职位白名单，也不会后台
-自动收集内容。提交知识必须由员工显式发起，并分别确认预览和最终发布。
+The package contains separate universal-query, explicit onboarding/self-check, and explicit
+current-task submission Skills plus the dedicated `company_knowledge_assistant` MCP declaration.
+It intentionally contains no authentication code, tokens, employee or job allowlists, server
+policy, retrieval implementation, third-party connector, Hook, background collector, custom UI, or
+Memova product endpoint.
 
-版本 `0.4.1` 在受保护工具发现前检查专用 MCP 登录状态，并把 `Not logged in` 路由到员工本人
-Microsoft OAuth。登录完成后必须完全重启 Codex 并新建任务，再执行七工具和身份自检。Plugin 不
-接收密码、MFA、Token、Cookie 或回调内容。
+S10-03 adds the general P0 submission Skill. It starts only from an explicit employee request,
+assesses at most three current-task candidates, routes each fact to one of seven receipt types, and
+requires separate exact approvals for ephemeral preparation and durable publication. The ordinary
+query Skill still cannot call publication tools. A check request, candidate selection, earlier
+approval, ambiguous confirmation, or changed preview never authorizes publication.
 
-版本 `0.4.2` 为发布预览增加与后端一致的完整 `ReceiptCandidateV1` 机器契约。提交 Skill 只按该
-契约构造候选；校验失败时后端返回安全字段路径，不回显被拒绝内容，也不要求猜测服务端字段。
+The production URL in `.mcp.json` is the current Pilot MCP binding. The independently validated
+public distribution repository is `gxyfred/memova-company-knowledge-plugin`; employees can read it
+without GitHub login and should follow its fixed installation prompt.
 
-发布仍使用员工本人委托身份。安装与升级说明见仓库根目录 `README.md`。
+Version `0.4.1` adds a deterministic first-login bootstrap before protected-tool discovery. It
+classifies an absent, disabled, unauthenticated, or authenticated-but-unbound MCP separately and
+directs an unauthenticated employee through `codex mcp login company_knowledge_assistant` using
+their own Microsoft browser session. It never receives credentials and requires a full Codex
+restart and new conversation after first login.
+
+Version `0.4.2` exposes the complete, dereferenced `ReceiptCandidateV1` contract on the MCP prepare
+tool and bundles the same generated schema with the submission Skill. Invalid candidates now return
+safe field paths, so employees can correct the candidate without revealing rejected content or
+guessing server fields.
+
+Version `0.4.3` adds a bounded `current_task_business_status` prepare input. For status facts
+selected from the current Codex task, the employee and model provide only the selected semantic
+fields; the server derives the authenticated knowledge owner and constructs the fixed Codex source
+route, locator, revision, immutable anchor, evidence manifest and evidence hash. Employees no
+longer need an unrelated HTTPS source link for this route.
+
+Every active employee publication still uses that employee's request-scoped Microsoft OBO
+identity. The Plugin does not permit a shared Publisher identity or job-based submission allowlist;
+Chenchen may normally query without submitting by choice.
+
+The repository-level [employee operations](../../docs/employee-operations.md) and
+[administrator operations](../../docs/admin-operations.md) guides define the S10-04 usage and
+release boundaries. The current manifest is `0.4.3`; OAuth behavior remains unchanged from
+`0.4.1`, while current-task status provenance is now server-owned.
+
+Validate locally from the repository root:
+
+```bash
+.venv/bin/python /Users/gxyfred/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py \
+  plugins/memova-company-knowledge
+.venv/bin/python -m pytest tests/contract/test_plugin_contract.py \
+  tests/contract/test_plugin_onboarding_contract.py \
+  tests/contract/test_plugin_submission_contract.py \
+  tests/acceptance/test_plugin_onboarding_acceptance.py \
+  tests/acceptance/test_plugin_submission_acceptance.py \
+  tests/security/test_plugin_security.py
+```

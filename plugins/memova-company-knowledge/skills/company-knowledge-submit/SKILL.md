@@ -8,10 +8,12 @@ description: Check and explicitly submit current-task knowledge to Memova's comp
 Provide the P0 employee-initiated submission workflow through the dedicated
 `company_knowledge_assistant` MCP. Before assessing candidates, read
 `references/submission-workflow-contract.json`, `references/trigger-routing-v1.json`, and
-`references/receipt-candidate-v1.schema.json`. Treat their outcomes, gate order, receipt routes,
-candidate fields, enum values, trigger IDs, exclusion rules, approval boundaries, and stop
-conditions as authoritative. The Company MCP remains authoritative for identity, capabilities,
-source/target registries, validation, idempotency, audit, publication, and index state.
+`references/receipt-candidate-v1.schema.json`. For a `business_status` selected from the current
+Codex task, also read `references/current-task-business-status-selection-v1.schema.json`. Treat
+their outcomes, gate order, receipt routes, candidate fields, enum values, trigger IDs, exclusion
+rules, approval boundaries, and stop conditions as authoritative. The Company MCP remains
+authoritative for identity, capabilities, source/target registries, validation, idempotency, audit,
+publication, and index state.
 
 ## Explicit entry only
 
@@ -60,6 +62,13 @@ source/target registries, validation, idempotency, audit, publication, and index
 - Correction and source-invalid cases inherit the original receipt type and require
   `previous_receipt_id`, `supersedes_knowledge_id`, and a substantive correction reason. Create a
   forward superseding record; never edit, overwrite, hide, or delete history.
+- For a `business_status` selected from the current Codex task, construct only the bounded
+  `CurrentTaskBusinessStatusSelectionV1` fields and pass them as the
+  `current_task_business_status` tool argument. The Skill must not provide `source_locator`, source
+  ID/system/object/access basis, revision, immutable locator, evidence manifest/hash, or
+  `knowledge_owner_upn`; those fields belong to the server-owned current-task route. The test marker
+  or business object ID belongs in `business_object_id`. It must not ask for an HTTPS link merely
+  because the evidence is the current Codex task.
 - Construct one `ReceiptCandidateV1` from the selected bounded evidence using only the fields,
   required sets, formats, and enum values in `references/receipt-candidate-v1.schema.json`. Do not
   guess missing fields, source identifiers, locators, revisions, hashes, or evidence-manifest
@@ -70,14 +79,14 @@ source/target registries, validation, idempotency, audit, publication, and index
 
 ## Approval-gated preparation
 
-Before calling `prepare_knowledge_submission`, show the exact candidate, receipt type, selected
-evidence, exclusions, Company MCP target, and expected effect: a 30-minute employee-owned ephemeral
-preview, not Published Knowledge. Ask for explicit approval for this exact remote prepare action.
-Candidate selection or the initial `@公司知识助手` invocation is not preparation approval.
+Before calling `prepare_knowledge_submission`, show the exact candidate or current-task status
+selection, receipt type, selected evidence, exclusions, Company MCP target, and expected effect: a
+30-minute employee-owned ephemeral preview, not Published Knowledge. Ask for explicit approval for this exact remote prepare action. Candidate selection or the initial `@公司知识助手` invocation is not preparation approval.
 
-After approval, call `prepare_knowledge_submission` once with the candidate. Do not automatically
-retry, switch sources, broaden evidence, or prepare other candidates. If blocked, present safe field
-errors and return to assessment; do not weaken a gate. If ready, show all of:
+After approval, call `prepare_knowledge_submission` once with either `candidate` or
+`current_task_business_status`, never both. Do not automatically retry, switch sources, broaden
+evidence, or prepare other candidates. If blocked, present safe field errors and return to
+assessment; do not weaken a gate. If ready, show all of:
 
 - the exact Published content preview and destination;
 - normalized receipt type, source locator/revision/hash, snapshot time, owner and policy result;

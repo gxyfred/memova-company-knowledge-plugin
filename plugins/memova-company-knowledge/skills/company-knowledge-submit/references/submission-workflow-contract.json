@@ -1,11 +1,28 @@
 {
   "contract_version": "1.0",
-  "plugin_version": "0.4.2",
+  "plugin_version": "0.4.3",
   "mcp_server": "company_knowledge_assistant",
   "candidate_contract": {
     "schema": "references/receipt-candidate-v1.schema.json",
     "source_of_truth": "packages/contracts/v1/submission-receipt-v1.schema.json#/$defs/ReceiptCandidateV1",
     "dereferenced": true
+  },
+  "current_task_business_status_contract": {
+    "schema": "references/current-task-business-status-selection-v1.schema.json",
+    "source_of_truth": "packages/contracts/v1/current-task-business-status-selection-v1.schema.json",
+    "tool_argument": "current_task_business_status",
+    "server_owned_fields": [
+      "source_id",
+      "source_system",
+      "source_locator",
+      "source_object_type",
+      "source_access_basis",
+      "source_revision",
+      "immutable_locator",
+      "evidence_manifest",
+      "evidence_sha256",
+      "knowledge_owner_upn"
+    ]
   },
   "required_tools": [
     "get_profile",

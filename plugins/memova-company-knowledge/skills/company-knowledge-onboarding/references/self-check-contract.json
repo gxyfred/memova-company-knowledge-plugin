@@ -1,6 +1,6 @@
 {
   "contract_version": "1.1",
-  "plugin_version": "0.4.2",
+  "plugin_version": "0.4.3",
   "mcp_server": "company_knowledge_assistant",
   "required_tools": [
     "get_profile",
@@ -73,7 +73,7 @@
       "id": "INSTALL_VERSION",
       "required": true,
       "mode": "local",
-      "pass_condition": "plugin_version_is_0_4_2_or_newer"
+      "pass_condition": "plugin_version_is_0_4_3_or_newer"
     },
     {
       "id": "FRESH_SESSION",
