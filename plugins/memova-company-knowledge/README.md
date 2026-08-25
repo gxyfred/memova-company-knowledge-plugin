@@ -37,14 +37,20 @@ fields; the server derives the authenticated knowledge owner and constructs the 
 route, locator, revision, immutable anchor, evidence manifest and evidence hash. Employees no
 longer need an unrelated HTTPS source link for this route.
 
+Version `0.4.4` fixes the submit confirmation binding. Codex must copy the exact
+`client_request_id` from the prepared `normalized_candidate` together with the same preview ID and
+preview hash; generating a new request ID at submit is explicitly forbidden. The server's existing
+fail-closed idempotency check is unchanged.
+
 Every active employee publication still uses that employee's request-scoped Microsoft OBO
 identity. The Plugin does not permit a shared Publisher identity or job-based submission allowlist;
 Chenchen may normally query without submitting by choice.
 
 The repository-level [employee operations](../../docs/employee-operations.md) and
 [administrator operations](../../docs/admin-operations.md) guides define the S10-04 usage and
-release boundaries. The current manifest is `0.4.3`; OAuth behavior remains unchanged from
-`0.4.1`, while current-task status provenance is now server-owned.
+release boundaries. The current manifest is `0.4.4`; OAuth behavior remains unchanged from
+`0.4.1`, current-task status provenance remains server-owned, and submit identity now stays bound
+to the prepared candidate.
 
 Validate locally from the repository root:
 

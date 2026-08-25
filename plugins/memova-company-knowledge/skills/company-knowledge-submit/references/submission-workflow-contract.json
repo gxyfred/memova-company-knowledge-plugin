@@ -1,6 +1,6 @@
 {
   "contract_version": "1.0",
-  "plugin_version": "0.4.3",
+  "plugin_version": "0.4.4",
   "mcp_server": "company_knowledge_assistant",
   "candidate_contract": {
     "schema": "references/receipt-candidate-v1.schema.json",
@@ -82,6 +82,13 @@
       "preview_payload_sha256",
       "user_confirmed"
     ],
+    "confirmation_binding": {
+      "client_request_id": "copy_exactly_from_normalized_candidate.client_request_id",
+      "preview_id": "copy_exactly_from_preview.preview_id",
+      "preview_payload_sha256": "copy_exactly_from_preview.preview_payload_sha256",
+      "user_confirmed": "true_after_separate_exact_confirmation",
+      "fresh_client_request_id_forbidden": true
+    },
     "candidate_payload_accepted": false,
     "maximum_calls_per_confirmation": 1,
     "effect": "direct_published_knowledge_plus_immutable_receipt",

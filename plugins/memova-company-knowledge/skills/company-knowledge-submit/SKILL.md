@@ -102,8 +102,10 @@ for confirmation and requires a newly approved prepare call.
 - Ask for a second, explicit confirmation only after displaying the complete server preview. The
   employee must clearly confirm publishing that exact preview; earlier approval, “continue”, silence,
   or confirmation of a different preview is insufficient.
-- Then call `submit_knowledge_candidate` exactly once with only a fresh client request ID, the same
-  `preview_id`, the same `preview_payload_sha256`, and `user_confirmed: true`. Never resend or
+- Then call `submit_knowledge_candidate` exactly once with only the four confirmation fields. Copy
+  the exact `client_request_id` from `normalized_candidate`; use that same
+  `preview_id`, the same `preview_payload_sha256`, and `user_confirmed: true`. Do not generate a
+  fresh request ID for submit. Never resend or
   reconstruct the candidate payload at submit time.
 - A successful call directly creates Published Knowledge plus an immutable SubmissionReceipt; no
   Draft or human review queue follows. Report `knowledge_id`, `receipt_id`, Published target URL,
