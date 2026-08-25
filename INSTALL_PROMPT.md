@@ -27,3 +27,6 @@
 如果任一步失败，请停在只读诊断并告诉我确切失败步骤和状态；不要删除配置、绕过认证或使用他人账号。
 如需撤销本机专用 MCP 登录，只在我明确要求时运行：
 `codex mcp logout company_knowledge_assistant`。
+
+安装和入职自检完成后，员工可按照
+[`EMPLOYEE_GUIDE_ZH.md`](EMPLOYEE_GUIDE_ZH.md) 学习日常查询、提交、预览确认、更正和故障处理。

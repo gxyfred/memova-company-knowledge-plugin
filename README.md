@@ -9,6 +9,11 @@
 让 Codex 完成安装和验证。仓库可以匿名只读访问，不要求员工登录 GitHub，也不需要理解
 `git clone`。
 
+所有员工现在都可按统一流程参加安装和真实使用测试。第一次使用、日常查询、本人委托知识发布、
+跨员工验证、更正和常见故障处理，请直接阅读
+[`EMPLOYEE_GUIDE_ZH.md`](EMPLOYEE_GUIDE_ZH.md)。该指南面向完全不了解 GitHub、Plugin、MCP
+或 OAuth 的员工。
+
 安装／升级话术会先刷新公开 Marketplace 和 Plugin，然后运行 `codex mcp list`。如果专用 MCP
 显示 `Not logged in`，Codex 会执行明确的 `codex mcp login company_knowledge_assistant` 命令；
 员工本人在 Microsoft 页面完成登录和 MFA。Codex 不会代为操作身份页面，也不会要求员工把密码、
