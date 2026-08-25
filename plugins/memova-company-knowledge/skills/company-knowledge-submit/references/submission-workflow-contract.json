@@ -1,6 +1,6 @@
 {
-  "contract_version": "1.0",
-  "plugin_version": "0.4.4",
+  "contract_version": "1.1",
+  "plugin_version": "0.4.5",
   "mcp_server": "company_knowledge_assistant",
   "candidate_contract": {
     "schema": "references/receipt-candidate-v1.schema.json",
@@ -37,7 +37,9 @@
     ],
     "assessment_is_prepare_approval": false,
     "assessment_is_publish_confirmation": false,
-    "bare_mention_is_sufficient": false
+    "bare_mention_is_sufficient": false,
+    "exact_submission_request_authorizes_prepare": true,
+    "exact_candidate_selection_authorizes_prepare": true
   },
   "default_candidate_limit": 3,
   "one_receipt_type_per_candidate": true,
@@ -68,14 +70,16 @@
     "tool": "prepare_knowledge_submission",
     "remote_effect": "employee_owned_ephemeral_preview",
     "preview_ttl_minutes": 30,
-    "exact_approval_required": true,
-    "maximum_calls_per_approval": 1,
+    "authorization": "explicit_exact_submission_request_or_exact_candidate_selection",
+    "separate_confirmation_after_exact_intent_required": false,
+    "maximum_calls_per_exact_intent": 1,
     "creates_published_knowledge": false,
     "cancel": "do_not_submit_and_allow_preview_to_expire"
   },
   "submit": {
     "tool": "submit_knowledge_candidate",
-    "separate_confirmation_required": true,
+    "single_final_confirmation_required": true,
+    "formal_confirmation_count_after_exact_intent": 1,
     "accepted_fields": [
       "client_request_id",
       "preview_id",
@@ -86,7 +90,7 @@
       "client_request_id": "copy_exactly_from_normalized_candidate.client_request_id",
       "preview_id": "copy_exactly_from_preview.preview_id",
       "preview_payload_sha256": "copy_exactly_from_preview.preview_payload_sha256",
-      "user_confirmed": "true_after_separate_exact_confirmation",
+      "user_confirmed": "true_after_single_final_exact_confirmation",
       "fresh_client_request_id_forbidden": true
     },
     "candidate_payload_accepted": false,
@@ -105,7 +109,7 @@
     "prepare_automatic_retries": 0,
     "submit_automatic_retries": 0,
     "unknown_submit_outcome": "preserve_operation_id_and_check_status_never_blind_retry",
-    "changed_preview": "obtain_new_prepare_approval_and_prepare_again"
+    "changed_preview": "obtain_new_exact_selection_and_prepare_again"
   },
   "correction": {
     "inherits_original_receipt_type": true,
@@ -129,9 +133,10 @@
   ],
   "state_transitions": [
     "idle->assessed",
+    "idle->exact_submission_intent",
     "assessed->candidate_selected",
-    "candidate_selected->prepare_approved",
-    "prepare_approved->preview_ready",
+    "exact_submission_intent->preview_ready",
+    "candidate_selected->preview_ready",
     "preview_ready->preview_cancelled",
     "preview_ready->submit_confirmed",
     "submit_confirmed->published_visible",

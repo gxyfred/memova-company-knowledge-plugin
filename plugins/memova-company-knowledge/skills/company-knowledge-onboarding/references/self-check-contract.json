@@ -1,6 +1,6 @@
 {
-  "contract_version": "1.1",
-  "plugin_version": "0.4.4",
+  "contract_version": "1.2",
+  "plugin_version": "0.4.5",
   "mcp_server": "company_knowledge_assistant",
   "required_tools": [
     "get_profile",
@@ -62,8 +62,9 @@
   },
   "remote_mutation_boundaries": {
     "profile_and_query": "read_only",
-    "prepare_knowledge_submission": "ephemeral_remote_state_requires_exact_approval",
-    "submit_knowledge_candidate": "durable_remote_write_requires_separate_exact_approval",
+    "prepare_knowledge_submission": "exact_submission_intent_or_exact_candidate_selection_no_redundant_confirmation",
+    "submit_knowledge_candidate": "durable_remote_write_requires_single_final_exact_confirmation",
+    "daily_submission_formal_confirmation_count": 1,
     "cancel": "do_not_submit_and_allow_preview_to_expire",
     "preview_ttl_minutes": 30,
     "rollback": "forward_correction_or_recovery_never_delete"
@@ -73,7 +74,7 @@
       "id": "INSTALL_VERSION",
       "required": true,
       "mode": "local",
-      "pass_condition": "plugin_version_is_0_4_4_or_newer"
+      "pass_condition": "plugin_version_is_0_4_5_or_newer"
     },
     {
       "id": "FRESH_SESSION",
@@ -127,7 +128,7 @@
       "id": "CONFIRM_DELEGATED_PUBLICATION",
       "required": true,
       "mode": "approval_gated_durable_write",
-      "pass_condition": "employee_separately_approves_confirm_and_sharepoint_receipt_submitter_match_own_identity"
+      "pass_condition": "employee_gives_single_final_confirmation_and_sharepoint_receipt_submitter_match_own_identity"
     },
     {
       "id": "PERMISSION_NEGATIVE",
@@ -156,7 +157,7 @@
   ],
   "employee_completion": {
     "PREVIEW_CANCEL": "pass_only_after_exact_preview_approval_and_no_submit",
-    "CONFIRM_DELEGATED_PUBLICATION": "pass_only_after_separate_exact_confirmation_and_submitter_identity_readback"
+    "CONFIRM_DELEGATED_PUBLICATION": "pass_only_after_single_final_exact_confirmation_and_submitter_identity_readback"
   },
   "completion_rule": "all_required_gates_pass; not_run_is_incomplete; withheld_remote_approval_is_incomplete_not_failed",
   "sensitive_test_markers": [

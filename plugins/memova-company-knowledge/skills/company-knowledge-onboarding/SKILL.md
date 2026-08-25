@@ -98,15 +98,16 @@ the employee OAuth path.
   policy version, and expiry. For a cancel rehearsal, discard the preview and do **not** call
   `submit_knowledge_candidate`; cancellation means allowing the preview to expire.
 
-## Separately approved confirmation rehearsal
+## Single final confirmation rehearsal
 
 - A confirmation rehearsal is a real remote write: it creates Published Knowledge plus an
-  immutable SubmissionReceipt and can enqueue an index projection. Never treat approval for the
-  preview as approval to confirm.
+  immutable SubmissionReceipt and can enqueue an index projection. Never treat the intent or selection that authorized
+  the preview as approval to publish.
 - Before calling `submit_knowledge_candidate`, show the exact preview ID, destination, effect,
-  audit identity, and correction/forward-recovery path; obtain a second explicit user approval.
-  Never promise deletion as rollback. After confirmation, use `get_publication_status` for bounded
-  status inspection and report Published, Receipt, and Index states separately.
+  audit identity, and correction/forward-recovery path; obtain the single final explicit publication
+  confirmation. Never promise deletion as rollback. After confirmation, use
+  `get_publication_status` for bounded status inspection and report Published, Receipt, and Index
+  states separately.
 - Verify that the SharePoint author, operation submitter, and Receipt submitter all resolve to the
   current employee. An app-only or shared Publisher identity is a failure, not a fallback.
 
@@ -123,7 +124,7 @@ the employee OAuth path.
 - Complete onboarding only when the contract completion rule is satisfied. `not_run` is never
   success. Every active employee uses the same submit rehearsal contract; Chenchen may choose not
   to run it in ordinary work, but is not a role-based denial case. Completion requires both the
-  approved cancel rehearsal and separately approved confirmed rehearsal. If approval is withheld,
+  approved cancel rehearsal and the single-final-confirmation rehearsal. If approval is withheld,
   report onboarding as incomplete, not failed.
 - Never persist the profile, employee identifiers, tokens, or check transcript in Plugin files.
   Stable Plugin, policy, mapping, source-registry, terminology-registry, or workflow-version changes

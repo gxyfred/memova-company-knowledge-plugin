@@ -12,9 +12,11 @@ Memova product endpoint.
 
 S10-03 adds the general P0 submission Skill. It starts only from an explicit employee request,
 assesses at most three current-task candidates, routes each fact to one of seven receipt types, and
-requires separate exact approvals for ephemeral preparation and durable publication. The ordinary
-query Skill still cannot call publication tools. A check request, candidate selection, earlier
-approval, ambiguous confirmation, or changed preview never authorizes publication.
+uses an exact submission request or exact candidate selection to authorize one ephemeral preview.
+It does not ask for a redundant preview-creation confirmation. The ordinary query Skill still
+cannot call publication tools, and durable publication requires the single final confirmation after
+the complete server preview. A check request, ambiguous confirmation, or changed preview never
+authorizes publication.
 
 The production URL in `.mcp.json` is the current Pilot MCP binding. The independently validated
 public distribution repository is `gxyfred/memova-company-knowledge-plugin`; employees can read it
@@ -42,15 +44,21 @@ Version `0.4.4` fixes the submit confirmation binding. Codex must copy the exact
 preview hash; generating a new request ID at submit is explicitly forbidden. The server's existing
 fail-closed idempotency check is unchanged.
 
+Version `0.4.5` removes the redundant confirmation before ephemeral preview creation. An explicit
+request to submit exact selected content or an exact candidate selection authorizes one prepare
+call; only the complete server preview receives the single final publication confirmation. Preview
+hash, request identity, audit, delegated ownership, fail-closed validation and no-auto-publish
+protections remain unchanged.
+
 Every active employee publication still uses that employee's request-scoped Microsoft OBO
 identity. The Plugin does not permit a shared Publisher identity or job-based submission allowlist;
 Chenchen may normally query without submitting by choice.
 
 The repository-level [employee operations](../../docs/employee-operations.md) and
 [administrator operations](../../docs/admin-operations.md) guides define the S10-04 usage and
-release boundaries. The current manifest is `0.4.4`; OAuth behavior remains unchanged from
-`0.4.1`, current-task status provenance remains server-owned, and submit identity now stays bound
-to the prepared candidate.
+release boundaries. The current manifest is `0.4.5`; OAuth behavior remains unchanged from
+`0.4.1`, current-task status provenance remains server-owned, submit identity stays bound to the
+prepared candidate, and only the final server preview requires a publication confirmation.
 
 Validate locally from the repository root:
 

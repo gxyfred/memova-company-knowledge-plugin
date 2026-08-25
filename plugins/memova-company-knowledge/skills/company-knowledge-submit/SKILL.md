@@ -73,20 +73,25 @@ publication, and index state.
   required sets, formats, and enum values in `references/receipt-candidate-v1.schema.json`. Do not
   guess missing fields, source identifiers, locators, revisions, hashes, or evidence-manifest
   values. If the current task cannot supply a fully valid candidate, stop at `NEED_MORE_EVIDENCE`
-  before asking for prepare approval. Never expose employee IDs, ACLs, arbitrary targets, hidden
+  before preparation. Never expose employee IDs, ACLs, arbitrary targets, hidden
   server fields, or raw sensitive material. Process multiple candidates sequentially, each with its
   own preview and confirmation.
 
-## Approval-gated preparation
+## Exact-intent preparation without a redundant confirmation
 
-Before calling `prepare_knowledge_submission`, show the exact candidate or current-task status
-selection, receipt type, selected evidence, exclusions, Company MCP target, and expected effect: a
-30-minute employee-owned ephemeral preview, not Published Knowledge. Ask for explicit approval for this exact remote prepare action. Candidate selection or the initial `@公司知识助手` invocation is not preparation approval.
+An assessment-only request, bare `@公司知识助手`, vague interest, or an unselected candidate does not
+authorize preparation. An explicit request to submit exact selected content authorizes one prepare
+call. After an assessment, the employee's exact selection of one displayed candidate also
+authorizes one prepare call. State that prepare creates only a 30-minute employee-owned ephemeral
+preview and not Published Knowledge. Do not ask for a redundant preview-creation confirmation once
+that exact intent or selection is already present.
 
-After approval, call `prepare_knowledge_submission` once with either `candidate` or
-`current_task_business_status`, never both. Do not automatically retry, switch sources, broaden
-evidence, or prepare other candidates. If blocked, present safe field errors and return to
-assessment; do not weaken a gate. If ready, show all of:
+If the Skill materially changes the content, evidence, exclusions, receipt type, target, owner, or
+correction chain after the employee's request or selection, show the revised candidate and obtain a
+new exact selection before prepare. Then call `prepare_knowledge_submission` once with either
+`candidate` or `current_task_business_status`, never both. Do not automatically retry, switch
+sources, broaden evidence, or prepare other candidates. If blocked, present safe field errors and
+return to assessment; do not weaken a gate. If ready, show all of:
 
 - the exact Published content preview and destination;
 - normalized receipt type, source locator/revision/hash, snapshot time, owner and policy result;
@@ -95,13 +100,14 @@ assessment; do not weaken a gate. If ready, show all of:
 
 Cancel means do not call `submit_knowledge_candidate` and allow the preview to expire. Any content,
 evidence, target, owner, receipt type, or correction-chain change invalidates the displayed preview
-for confirmation and requires a newly approved prepare call.
+for confirmation and requires a new exact employee request or candidate selection before prepare.
 
-## Separate final confirmation and direct publication
+## Single final confirmation and direct publication
 
-- Ask for a second, explicit confirmation only after displaying the complete server preview. The
-  employee must clearly confirm publishing that exact preview; earlier approval, “continue”, silence,
-  or confirmation of a different preview is insufficient.
+- The single final publication confirmation happens only after displaying the complete server
+  preview. The employee must clearly confirm publishing that exact preview; the intent or selection
+  that authorized preparation, “continue”, silence, or confirmation of a different preview is
+  insufficient.
 - Then call `submit_knowledge_candidate` exactly once with only the four confirmation fields. Copy
   the exact `client_request_id` from `normalized_candidate`; use that same
   `preview_id`, the same `preview_payload_sha256`, and `user_confirmed: true`. Do not generate a
