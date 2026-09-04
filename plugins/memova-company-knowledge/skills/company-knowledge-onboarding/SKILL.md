@@ -1,141 +1,110 @@
 ---
 name: company-knowledge-onboarding
-description: Run the explicit installation, onboarding, connection, identity, capability, seven-receipt, snapshot, preview/cancel, confirmed-rehearsal, permission, and sensitive-data self-check for Memova's 公司知识助手. Use only when the user asks to onboard, set up, diagnose readiness, or run the self-check; never trigger it for an ordinary company question.
+description: Run Memova 公司知识助手 employee readiness or an explicitly requested administrator/QA deep check. Ordinary onboarding is read-only; deep checks remain synthetic, sequential, and non-durable. Never trigger for an ordinary company question.
 ---
 
 # Company Knowledge Onboarding
 
-Run a bounded, fail-closed readiness workflow for the dedicated
-`company_knowledge_assistant` MCP. Read `references/self-check-contract.json` before the first check
-and treat its gate IDs, retry classifications, receipt types, and completion rule as authoritative.
-This Skill orchestrates checks; it does not implement authentication, infer authorization, or
-change server policy.
+Run the bounded readiness workflow for the dedicated `company_knowledge_assistant` MCP. Read
+`references/self-check-contract.json` first. Its selected mode, gate IDs, retry classes, frozen
+probe, and completion rule are authoritative. This Skill never infers authorization or changes
+server policy.
 
-## Entry boundary
+## Select exactly one mode
 
-- Trigger only after an explicit onboarding, setup, migration, connection-diagnosis, or self-check
-  request. A company question, bare Plugin invocation, or query failure must not start a write
-  rehearsal.
-- Explain that installation, Plugin updates, or first-time MCP login require a full Codex restart
-  and a new conversation before a reliable tool check. Inspect only the current Plugin version and
-  dedicated MCP host status; do not install, upgrade, distribute, authenticate, or edit
-  marketplace/workspace settings without the employee's explicit request or approval.
+- The ordinary phrase “开始公司知识助手入职自检” selects `employee_readiness`. This is the default
+  employee flow. It is read-only and must not call `prepare_knowledge_submission`,
+  `submit_knowledge_candidate`, or mutate any remote state.
+- Select `admin_qa_deep` only when the user explicitly asks for “管理员/QA深度验收” or names that
+  mode. Never escalate an ordinary employee self-check into deep checks because a prior run failed.
+- A real publication acceptance is outside onboarding. Run it only for a real, employee-selected
+  company fact through the submission Skill. Never publish synthetic onboarding content, so it
+  cannot contaminate normal company search.
+
+## Entry and connection boundary
+
+- Trigger only for an explicit onboarding, setup, connection diagnosis, or self-check request. A
+  company question, bare Plugin invocation, or query failure does not start onboarding.
+- Installation, Plugin updates, and first-time MCP login require a full Codex restart and a new
+  conversation before reliable tool discovery. Inspect only the Plugin version and the dedicated
+  MCP row. Do not install, upgrade, or edit settings without the employee's request.
 - P0 checks no GitHub, Figma, Feishu, Azure, Google, Slack, or other third-party connection and must
-  not request per-platform OAuth. SharePoint access is mediated by the dedicated Company MCP; do
-  not bypass it with a direct employee connector.
+  not request per-platform OAuth. Never bypass the Company MCP with a direct SharePoint connector.
 
 ## OAuth bootstrap
 
-Run this bootstrap before evaluating any required gate. The host can withhold protected MCP tools
-until the server is authenticated, so the workflow must not fail `MCP_TOOL_SURFACE` before offering
-the employee OAuth path.
+Run this before evaluating gates because the host can hide protected tools before authentication.
 
-1. Run the local, read-only `codex mcp list` status check and inspect only the row for
-   `company_knowledge_assistant`.
-2. If the server is absent or disabled, stop with `host_binding_missing` or
-   `host_binding_disabled`. Do not substitute SharePoint or another MCP.
-3. If the server is enabled and reports `Not logged in`, explain that
-   `codex mcp login company_knowledge_assistant` opens the Microsoft authorization flow for this
-   dedicated MCP. Run it only when the employee's current installation/onboarding request already
-   authorizes first-time login or after obtaining explicit approval. The employee completes the
-   Microsoft browser flow using their own `@memova.ai` account; never operate the identity-provider
-   page for them.
-4. Yield control while the employee enters any password or MFA only on Microsoft's page. Never ask
-   them to copy any credential, code, token, cookie, URL query, or callback content into Codex.
-   `codex mcp logout company_knowledge_assistant` is the local connection rollback.
-5. After the employee reports completion, run `codex mcp list` again. If it still reports
-   `Not logged in`, stop with `oauth_login_incomplete` and the exact retry command; do not loop or
-   reinstall. If authenticated, require the employee to fully quit and reopen Codex and start a new
-   conversation. The current run remains incomplete because its tool surface was created before
-   login.
-6. In the fresh conversation, if the server is authenticated but the seven required tools are
-   still absent, fail with `authenticated_host_binding_missing`. Only an authenticated server with
-   the exact seven tools may continue to the required gates.
+1. Run local read-only `codex mcp list` and inspect only `company_knowledge_assistant`.
+2. If absent or disabled, stop with `host_binding_missing` or `host_binding_disabled`.
+3. If enabled and `Not logged in`, explain that `codex mcp login company_knowledge_assistant`
+   opens Microsoft authorization for this MCP. The explicit onboarding request authorizes running
+   that command. The employee completes the Microsoft browser flow with their own `@memova.ai`
+   account; never operate the identity-provider page for them.
+4. Yield while the employee enters password or MFA only on Microsoft's page. Never ask the
+   employee to paste or dictate a password, access/refresh token, cookie, client secret, private
+   key, MFA code, recovery code, or session export. Never place any such value in a tool argument,
+   file, log, report, or conversation summary. Local rollback is
+   `codex mcp logout company_knowledge_assistant`.
+5. Recheck `codex mcp list`. If still unauthenticated, stop with `oauth_login_incomplete`. If
+   authenticated, require a full Codex restart and new conversation; the current run is incomplete.
+6. In the fresh conversation, an authenticated server without all seven required tools fails as
+   `authenticated_host_binding_missing`. Do not substitute another endpoint. The workflow must not
+   fail `MCP_TOOL_SURFACE` before offering the bounded OAuth bootstrap.
 
-## Authentication and profile
+## Strictly sequential protected calls
 
-1. After the OAuth bootstrap, verify that the current session exposes the exact required Company
-   MCP tools from the contract. Missing or unexpected tools fail the relevant gate; never
-   substitute another endpoint.
-2. Call `get_profile`. If the host unexpectedly requires Microsoft authorization again, return to
-   the bounded bootstrap classification instead of assuming that a tool call will open login.
-   Never ask the employee to paste or dictate a password, access/refresh token, cookie, client
-   secret, private key, MFA code, recovery code, or session export. Never place any such value in a
-   tool argument, file, log, report, or conversation summary. If one appears, stop handling it and
-   ask the employee to revoke/rotate it through the proper administrator path.
-3. Apply the contract retry budget: one initial attempt plus at most two additional guided attempts.
-   Retry only a transient network, dependency, or connection failure. Do not retry an unauthorized
-   employee, administrator-disabled application, wrong tenant, missing site permission, identity
-   mismatch, policy denial, or consent requiring administrator action.
-4. Show only the safe profile fields needed for the employee to verify that the signed-in identity
-   is their own. Ask for a yes/no identity confirmation; never ask for identity documents. Stop on
-   mismatch and never continue using another employee's account.
-5. Read returned job assignments only as explanatory metadata. Current explicit capability grants
-   are the sole authorization input. Job, title, department, manager, and historical contribution
-   types never restrict questions or grant submission permission.
+- Never issue protected Company MCP calls in parallel or as a tool batch. Wait for each complete
+  result before starting the next call. This includes profile, answer, status, preview, and
+  negative probes.
+- On one unexpected `AUTHENTICATION_REQUIRED`, stop the remaining sequence. Call `get_profile`
+  once, serially, to allow the host refresh boundary to settle. If it succeeds, retry the exact
+  failed call once with unchanged arguments and identifiers. If profile also requires
+  authentication, use the OAuth bootstrap once; do not fan out retries or repeatedly reinstall.
+- The total retry budget remains one initial attempt plus at most two guided attempts. Do not retry
+  an unauthorized employee, administrator-disabled app, wrong tenant, missing site permission,
+  identity mismatch, admin-consent requirement, or policy denial.
 
-## Read and receipt readiness
+## Employee readiness — default, read-only
 
-1. Confirm the contract's seven receipt types and required MCP tool surface. A local declaration is
-   package readiness, not proof of a live backend binding; mark a live check `not_run` rather than
-   claiming success when no server response exists.
-2. Read `answer_probe` from the machine contract. Call `answer` exactly once with its exact frozen
-   question, pre-platform `as_of` time scope, filters, and selected IDs. The temporal boundary is
-   the deterministic empty-snapshot invariant; do not replace it with random text, a current-time
-   query, or a company question that can retrieve semantic nearest neighbors. Pass only when the
-   response exactly preserves the expected insufficient-evidence
-   status, empty citations/conflicts, gap reason, freshness labels, and a non-empty MCP
-   `policy_version`. This probe is a transport/contract canary, not a company-fact evaluation.
-3. Verify that `search`, `fetch`, `prepare_knowledge_submission`,
-   `submit_knowledge_candidate`, and `get_publication_status` are present. Do not call write tools
-   merely to prove that they exist.
+1. Verify Plugin `0.4.8` or newer, a fresh conversation, and the exact seven tool names. Presence
+   is checked without calling write tools.
+2. Call `get_profile` once. Show only safe fields needed for the employee to confirm the signed-in
+   identity is their own. Stop on mismatch. Job assignments are explanatory only; explicit current
+   capabilities are authoritative and employees remain equal participants regardless of title.
+3. Confirm all seven frozen receipt types are declared. Do not overclaim live support from local
+   files alone.
+4. Call `answer` once with the exact `answer_probe` question, pre-platform `as_of`, filters, and
+   selected IDs. Pass only on the frozen insufficient-evidence status, empty citations/conflicts,
+   gap reason, freshness, and non-empty returned `policy_version`.
+5. Mark only the gates listed under `modes.employee_readiness.required_gates`. Mark preview,
+   permission, sensitive-negative, and delegated-publication gates `not_applicable`; do not ask the
+   employee to approve them. Complete when all selected-mode gates pass.
 
-## Controlled preview and cancel rehearsal
+## Administrator/QA deep check — explicit, synthetic, non-durable
 
-- A remote preview can create employee-owned ephemeral server state. Before calling
-  `prepare_knowledge_submission`, state the exact Company MCP target, synthetic or explicitly
-  approved evidence, expected ephemeral effect, 30-minute expiry, and absence of a Published item.
-  Obtain explicit user approval for that exact remote action.
-- Use only synthetic non-sensitive `general_knowledge` content unless the user separately approves
-  another evidence item and receipt type. For the synthetic rehearsal, call
-  `prepare_knowledge_submission` with only the `current_task_general_knowledge` input defined by
-  `preview_cancel_rehearsal`; generate fresh valid request/task/selection identifiers and supply the
-  bounded synthetic topic, claim, applicability, observation time and selection reason. Never
-  provide or invent `source_locator`, source identity, revision, evidence hash, immutable locator,
-  or knowledge-owner identity: the server derives them from the authenticated employee and bounded
-  current-task selection. Do not upload or copy real company secrets into a test.
-- Present the returned target, normalized payload, exclusions, warnings, capability decision,
-  policy version, and expiry. For a cancel rehearsal, discard the preview and do **not** call
-  `submit_knowledge_candidate`; cancellation means allowing the preview to expire.
+- Begin only from an explicit deep-mode request. Run all calls sequentially.
+- For preview/cancel, state the Company MCP target, 30-minute ephemeral effect, and that no
+  Published item or Receipt will be created. After exact approval, call
+  `prepare_knowledge_submission` with only `onboarding_rehearsal: "preview_cancel"`. The server
+  generates request/task/selection IDs, timestamps, source provenance, evidence, owner, and safe
+  content. Never model-build those fields. Show the result, then cancel by not submitting.
+- For the sensitive negative, call the same tool only with
+  `onboarding_rehearsal: "sensitive_negative"`. Pass only when the server rejects the reserved
+  marker before storing a preview. Never use real secrets or personal data.
+- Permission checks use only synthetic unavailable IDs and read-only status inspection. Pass on
+  safe not-found/denial without leaking another employee's object. Never impersonate an employee.
+- `CONFIRM_DELEGATED_PUBLICATION` is `not_applicable` in onboarding. If release acceptance needs a
+  real publish, switch to the submission Skill, use a real approved fact, obtain its single final
+  confirmation, and verify SharePoint Author, operation submitter, and Receipt submitter all match
+  the current employee.
 
-## Single final confirmation rehearsal
+## Reporting and safety
 
-- A confirmation rehearsal is a real remote write: it creates Published Knowledge plus an
-  immutable SubmissionReceipt and can enqueue an index projection. Never treat the intent or selection that authorized
-  the preview as approval to publish.
-- Before calling `submit_knowledge_candidate`, show the exact preview ID, destination, effect,
-  audit identity, and correction/forward-recovery path; obtain the single final explicit publication
-  confirmation. Never promise deletion as rollback. After confirmation, use
-  `get_publication_status` for bounded status inspection and report Published, Receipt, and Index
-  states separately.
-- Verify that the SharePoint author, operation submitter, and Receipt submitter all resolve to the
-  current employee. An app-only or shared Publisher identity is a failure, not a fallback.
-
-## Negative checks and completion
-
-- Permission checks use only synthetic IDs and require server denial for another employee's
-  preview, unauthorized destination, absent/revoked submit capability, app-only publication, or a
-  delegated principal mismatch. Do not impersonate an employee.
-- Sensitive-data checks use inert markers named in the contract, never real credentials, personal
-  data, production identifiers, or customer content. The preview must reject or exclude them.
-- Report every required gate as `pass`, `fail`, `not_run`, or `not_applicable`, with a safe error
-  classification and next action. Do not include raw tokens, stack traces, internal ACL detail, or
-  hidden identifiers.
-- Complete onboarding only when the contract completion rule is satisfied. `not_run` is never
-  success. Every active employee uses the same submit rehearsal contract; Chenchen may choose not
-  to run it in ordinary work, but is not a role-based denial case. Completion requires both the
-  approved cancel rehearsal and the single-final-confirmation rehearsal. If approval is withheld,
-  report onboarding as incomplete, not failed.
-- Never persist the profile, employee identifiers, tokens, or check transcript in Plugin files.
-  Stable Plugin, policy, mapping, source-registry, terminology-registry, or workflow-version changes
-  require a new conversation and a fresh self-check.
+- Report selected mode and each relevant gate as `pass`, `fail`, `not_run`, or `not_applicable`,
+  with a safe classification and next action. `not_run` never means success.
+- Never expose raw tokens, stack traces, hidden ACL detail, or credentials. Never persist profiles,
+  identifiers, or transcripts in Plugin files.
+- Never delete or overwrite Published Knowledge, Receipt, preview, operation, or audit history.
+  Stable Plugin, policy, mapping, registry, terminology, or workflow-version changes require a new
+  conversation and fresh employee-readiness check.

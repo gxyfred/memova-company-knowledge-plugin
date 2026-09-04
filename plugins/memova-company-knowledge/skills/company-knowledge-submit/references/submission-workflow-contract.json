@@ -1,6 +1,6 @@
 {
-  "contract_version": "1.2",
-  "plugin_version": "0.4.7",
+  "contract_version": "1.3",
+  "plugin_version": "0.4.8",
   "mcp_server": "company_knowledge_assistant",
   "candidate_contract": {
     "schema": "references/receipt-candidate-v1.schema.json",
@@ -98,17 +98,17 @@
     "single_final_confirmation_required": true,
     "formal_confirmation_count_after_exact_intent": 1,
     "accepted_fields": [
-      "client_request_id",
       "preview_id",
       "preview_payload_sha256",
       "user_confirmed"
     ],
     "confirmation_binding": {
-      "client_request_id": "copy_exactly_from_normalized_candidate.client_request_id",
+      "client_request_id": "server_resolves_from_authenticated_owned_preview; optional_0_4_7_value_is_ignored_for_backward_compatibility",
       "preview_id": "copy_exactly_from_preview.preview_id",
       "preview_payload_sha256": "copy_exactly_from_preview.preview_payload_sha256",
       "user_confirmed": "true_after_single_final_exact_confirmation",
-      "fresh_client_request_id_forbidden": true
+      "fresh_client_request_id_forbidden": true,
+      "model_copies_client_request_id": false
     },
     "candidate_payload_accepted": false,
     "maximum_calls_per_confirmation": 1,

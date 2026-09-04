@@ -1,6 +1,6 @@
 {
-  "contract_version": "1.4",
-  "plugin_version": "0.4.7",
+  "contract_version": "1.5",
+  "plugin_version": "0.4.8",
   "mcp_server": "company_knowledge_assistant",
   "required_tools": [
     "get_profile",
@@ -26,6 +26,50 @@
     "not_run",
     "not_applicable"
   ],
+  "default_mode": "employee_readiness",
+  "gate_requirement_source": "selected_mode.required_gates",
+  "modes": {
+    "employee_readiness": {
+      "trigger": "开始公司知识助手入职自检",
+      "remote_write_tools_allowed": false,
+      "required_gates": [
+        "INSTALL_VERSION",
+        "FRESH_SESSION",
+        "MCP_TOOL_SURFACE",
+        "MICROSOFT_OAUTH_PROFILE",
+        "SELF_IDENTITY_MATCH",
+        "JOB_AND_CAPABILITY_RESOLUTION",
+        "SEVEN_RECEIPT_TYPES",
+        "QUERY_AND_SNAPSHOT",
+        "NO_THIRD_PARTY_OAUTH",
+        "NO_CREDENTIAL_CAPTURE"
+      ]
+    },
+    "admin_qa_deep": {
+      "trigger": "开始公司知识助手管理员/QA深度验收",
+      "requires_explicit_mode_request": true,
+      "protected_calls": "strictly_sequential",
+      "durable_publication_allowed": false,
+      "required_gates": [
+        "INSTALL_VERSION",
+        "FRESH_SESSION",
+        "MCP_TOOL_SURFACE",
+        "MICROSOFT_OAUTH_PROFILE",
+        "SELF_IDENTITY_MATCH",
+        "JOB_AND_CAPABILITY_RESOLUTION",
+        "SEVEN_RECEIPT_TYPES",
+        "QUERY_AND_SNAPSHOT",
+        "PREVIEW_CANCEL",
+        "PERMISSION_NEGATIVE",
+        "SENSITIVE_DATA_NEGATIVE",
+        "NO_THIRD_PARTY_OAUTH",
+        "NO_CREDENTIAL_CAPTURE"
+      ],
+      "excluded_gate": "CONFIRM_DELEGATED_PUBLICATION",
+      "excluded_gate_status": "not_applicable",
+      "publication_acceptance": "use_a_real_approved_fact_through_the_submission_skill_never_synthetic_onboarding_content"
+    }
+  },
   "oauth_bootstrap": {
     "runs_before_required_gates": true,
     "status_command": "codex mcp list",
@@ -48,7 +92,8 @@
     "retryable": [
       "transient_network",
       "transient_dependency",
-      "connection_interrupted"
+      "connection_interrupted",
+      "authentication_refresh_boundary"
     ],
     "non_retryable": [
       "unauthorized_employee",
@@ -76,12 +121,19 @@
   "preview_cancel_rehearsal": {
     "receipt_type": "general_knowledge",
     "tool": "prepare_knowledge_submission",
-    "tool_argument": "current_task_general_knowledge",
+    "tool_argument": "onboarding_rehearsal",
+    "scenario": "preview_cancel",
     "source_provenance": "server_owned",
     "source_locator_from_employee": false,
     "synthetic_content_only": true,
     "submit_for_cancel": false,
     "preview_ttl_minutes": 30
+  },
+  "protected_call_scheduling": {
+    "parallel_calls_allowed": false,
+    "wait_for_each_result": true,
+    "authentication_required_recovery": "stop_batch_then_get_profile_once_then_retry_same_exact_call_once_after_profile_success",
+    "relogin": "only_after_the_serial_profile_probe_also_reports_authentication_required"
   },
   "remote_mutation_boundaries": {
     "profile_and_query": "read_only",
@@ -97,7 +149,7 @@
       "id": "INSTALL_VERSION",
       "required": true,
       "mode": "local",
-      "pass_condition": "plugin_version_is_0_4_7_or_newer"
+      "pass_condition": "plugin_version_is_0_4_8_or_newer"
     },
     {
       "id": "FRESH_SESSION",
@@ -178,11 +230,11 @@
       "pass_condition": "workflow_never_requests_or_persists_credentials_tokens_cookies_or_mfa"
     }
   ],
-  "employee_completion": {
+  "deep_qa_completion": {
     "PREVIEW_CANCEL": "pass_only_after_exact_preview_approval_and_no_submit",
-    "CONFIRM_DELEGATED_PUBLICATION": "pass_only_after_single_final_exact_confirmation_and_submitter_identity_readback"
+    "CONFIRM_DELEGATED_PUBLICATION": "not_applicable_in_onboarding; validate_real_publication_separately_through_submission_skill"
   },
-  "completion_rule": "all_required_gates_pass; not_run_is_incomplete; withheld_remote_approval_is_incomplete_not_failed",
+  "completion_rule": "all_gates_required_by_selected_mode_pass; not_run_is_incomplete; excluded_gates_are_not_applicable",
   "sensitive_test_markers": [
     "SYNTHETIC_PASSWORD_MARKER",
     "SYNTHETIC_TOKEN_MARKER",

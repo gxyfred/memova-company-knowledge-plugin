@@ -115,19 +115,28 @@ for confirmation and requires a new exact employee request or candidate selectio
   preview. The employee must clearly confirm publishing that exact preview; the intent or selection
   that authorized preparation, “continue”, silence, or confirmation of a different preview is
   insufficient.
-- Then call `submit_knowledge_candidate` exactly once with only the four confirmation fields. Copy
-  the exact `client_request_id` from `normalized_candidate`; use that same
-  `preview_id`, the same `preview_payload_sha256`, and `user_confirmed: true`. Do not generate a
-  fresh request ID for submit. Never resend or
-  reconstruct the candidate payload at submit time.
+- Then call `submit_knowledge_candidate` exactly once with only `preview_id`,
+  `preview_payload_sha256`, and `user_confirmed: true`. The service resolves the original
+  `client_request_id` from that authenticated employee-owned preview. Do not copy, generate, or
+  replace a request ID at submit time. Plugin 0.4.7 clients may still send the legacy field for
+  backward compatibility, but the server ignores it and 0.4.8 must omit it. Never resend or reconstruct the candidate
+  payload at submit time.
 - A successful call directly creates Published Knowledge plus an immutable SubmissionReceipt; no
   Draft or human review queue follows. Report `knowledge_id`, `receipt_id`, Published target URL,
-  audit reference, source/submission snapshot times, and `search_visibility`.
+  safe SharePoint Author readback, audit reference, source/submission snapshot times, and
+  `search_visibility`. Treat an Author that differs from the operation and Receipt submitter as a
+  fail-closed publication recovery condition.
 - `index_pending` means the records exist but are not yet searchable. Use
   `get_publication_status` only for bounded read-only status checks allowed by the contract; never
   claim visibility early.
 
 ## Failure and unknown outcome
+
+- Protected Company MCP calls are strictly sequential. Never issue profile, prepare, submit, or
+  status calls in parallel. On an unexpected `AUTHENTICATION_REQUIRED`, stop the sequence, run one
+  serial `get_profile` probe, and retry the exact failed call once only after that probe succeeds.
+  If profile also requires authentication, stop for the bounded OAuth bootstrap; never fan out
+  retries.
 
 - Do not blindly retry submit after a timeout, dependency failure, unknown outcome, one-sided write,
   hash mismatch, expired preview, idempotency conflict, or reconciliation requirement. Preserve any

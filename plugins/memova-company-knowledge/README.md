@@ -56,13 +56,20 @@ cancellation and ordinary current-task `general_knowledge` now use a typed serve
 derives source locator, revision, evidence anchors, hashes and owner without an employee-provided
 HTTPS URL.
 
+Version `0.4.8` makes ordinary employee onboarding a read-only readiness check and moves synthetic
+preview/negative checks behind an explicitly requested administrator/QA deep mode. Protected MCP
+calls are strictly sequential with bounded refresh-boundary recovery. The server owns onboarding
+rehearsal inputs, binds submit request identity from the authenticated preview, rejects all reserved
+sensitive markers, and returns safe SharePoint Author readback for new publications. Synthetic
+onboarding content is never durably published or added to normal company search.
+
 Every active employee publication still uses that employee's request-scoped Microsoft OBO
 identity. The Plugin does not permit a shared Publisher identity or job-based submission allowlist;
 Chenchen may normally query without submitting by choice.
 
 The repository-level [employee operations](../../docs/employee-operations.md) and
 [administrator operations](../../docs/admin-operations.md) guides define the S10-04 usage and
-release boundaries. The current manifest is `0.4.7`; OAuth behavior remains unchanged from
+release boundaries. The current manifest is `0.4.8`; OAuth bootstrap remains unchanged from
 `0.4.1`, current-task status and general-knowledge provenance remain server-owned, submit identity
 stays bound to the prepared candidate, and only the final server preview requires a publication
 confirmation.
