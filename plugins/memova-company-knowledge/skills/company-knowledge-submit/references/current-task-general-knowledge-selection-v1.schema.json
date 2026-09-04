@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CurrentTaskGeneralKnowledgeSelectionV1",
+  "description": "Bounded general-knowledge fields selected from the current Codex task. The server owns source identity, locator, revision, evidence anchors, and knowledge-owner identity.",
+  "type": "object",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "anyOf": [
+          {"required": ["previous_receipt_id"]},
+          {"required": ["supersedes_knowledge_id"]},
+          {"required": ["correction_reason"]}
+        ]
+      },
+      "then": {
+        "required": ["previous_receipt_id", "supersedes_knowledge_id", "correction_reason"]
+      }
+    }
+  ],
+  "properties": {
+    "client_request_id": {
+      "description": "Fresh UUID for this exact prepare request.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "current_task_id": {
+      "description": "Stable non-secret identifier for the current Codex task; not a URL.",
+      "type": "string",
+      "pattern": "^task_[A-Za-z0-9_-]{3,128}$"
+    },
+    "selection_id": {
+      "description": "Stable identifier for the explicitly selected bounded fields.",
+      "type": "string",
+      "pattern": "^sel_[A-Za-z0-9_-]{3,128}$"
+    },
+    "observed_at": {
+      "description": "When the selected current-task evidence was observed.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "topic": {"type": "string", "minLength": 3, "maxLength": 500},
+    "claim_summary": {"type": "string", "minLength": 20, "maxLength": 4000},
+    "applicability_scope": {"type": "string", "minLength": 3, "maxLength": 1000},
+    "selection_reason": {"type": "string", "minLength": 3, "maxLength": 1000},
+    "effective_from_or_observed_at": {"type": "string", "format": "date-time"},
+    "review_or_expiry_at": {"type": "string", "format": "date-time"},
+    "limitations": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1, "maxLength": 1000},
+      "maxItems": 50
+    },
+    "examples": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1, "maxLength": 1000},
+      "maxItems": 50
+    },
+    "related_knowledge_ids": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^kn_[0-9A-HJKMNP-TV-Z]{26}$"},
+      "maxItems": 50,
+      "uniqueItems": true
+    },
+    "external_references": {
+      "type": "array",
+      "items": {"type": "string", "format": "uri", "maxLength": 2048},
+      "maxItems": 20,
+      "uniqueItems": true
+    },
+    "decision_context": {"type": "string", "maxLength": 4000},
+    "redactions_applied": {
+      "type": "array",
+      "maxItems": 25,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "action": {"type": "string", "minLength": 1, "maxLength": 100},
+          "scope": {"type": "string", "minLength": 1, "maxLength": 500}
+        },
+        "required": ["action", "scope"]
+      }
+    },
+    "excluded_evidence_summary": {"type": "string", "maxLength": 2000},
+    "previous_receipt_id": {
+      "type": "string",
+      "pattern": "^rcpt_[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "supersedes_knowledge_id": {
+      "type": "string",
+      "pattern": "^kn_[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "correction_reason": {"type": "string", "minLength": 20, "maxLength": 2000}
+  },
+  "required": [
+    "client_request_id",
+    "current_task_id",
+    "selection_id",
+    "observed_at",
+    "topic",
+    "claim_summary",
+    "applicability_scope",
+    "selection_reason"
+  ]
+}

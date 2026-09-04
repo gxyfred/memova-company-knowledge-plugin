@@ -1,6 +1,6 @@
 {
-  "contract_version": "1.2",
-  "plugin_version": "0.4.5",
+  "contract_version": "1.3",
+  "plugin_version": "0.4.6",
   "mcp_server": "company_knowledge_assistant",
   "required_tools": [
     "get_profile",
@@ -60,6 +60,29 @@
       "policy_denied"
     ]
   },
+  "answer_probe": {
+    "question_template": "CKP-SELF-CHECK-UNPUBLISHED-{uuid}",
+    "uuid_requirement": "fresh_uuid_v4_per_run",
+    "time_scope": {"mode": "current", "as_of": null},
+    "filters": {},
+    "selected_knowledge_ids": [],
+    "expected_status": "insufficient_evidence",
+    "expected_knowledge_gap_reason": "no_matching_knowledge",
+    "expected_citations": [],
+    "expected_conflicts": [],
+    "expected_freshness": {"currentness": "unknown", "answer_as_of": null},
+    "expected_policy_version": "non_empty"
+  },
+  "preview_cancel_rehearsal": {
+    "receipt_type": "general_knowledge",
+    "tool": "prepare_knowledge_submission",
+    "tool_argument": "current_task_general_knowledge",
+    "source_provenance": "server_owned",
+    "source_locator_from_employee": false,
+    "synthetic_content_only": true,
+    "submit_for_cancel": false,
+    "preview_ttl_minutes": 30
+  },
   "remote_mutation_boundaries": {
     "profile_and_query": "read_only",
     "prepare_knowledge_submission": "exact_submission_intent_or_exact_candidate_selection_no_redundant_confirmation",
@@ -74,7 +97,7 @@
       "id": "INSTALL_VERSION",
       "required": true,
       "mode": "local",
-      "pass_condition": "plugin_version_is_0_4_5_or_newer"
+      "pass_condition": "plugin_version_is_0_4_6_or_newer"
     },
     {
       "id": "FRESH_SESSION",
@@ -116,13 +139,13 @@
       "id": "QUERY_AND_SNAPSHOT",
       "required": true,
       "mode": "read_only",
-      "pass_condition": "answer_probe_preserves_citations_conflicts_gaps_policy_and_snapshot_labels"
+      "pass_condition": "fresh_unpublished_uuid_probe_returns_the_frozen_insufficient_evidence_gap_freshness_and_policy_contract"
     },
     {
       "id": "PREVIEW_CANCEL",
       "required": true,
       "mode": "approval_gated_ephemeral_write",
-      "pass_condition": "employee_previews_under_own_delegated_identity_then_does_not_submit"
+      "pass_condition": "employee_previews_server_owned_current_task_general_knowledge_under_own_delegated_identity_then_does_not_submit"
     },
     {
       "id": "CONFIRM_DELEGATED_PUBLICATION",

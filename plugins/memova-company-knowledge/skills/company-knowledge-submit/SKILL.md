@@ -8,8 +8,9 @@ description: Check and explicitly submit current-task knowledge to Memova's comp
 Provide the P0 employee-initiated submission workflow through the dedicated
 `company_knowledge_assistant` MCP. Before assessing candidates, read
 `references/submission-workflow-contract.json`, `references/trigger-routing-v1.json`, and
-`references/receipt-candidate-v1.schema.json`. For a `business_status` selected from the current
-Codex task, also read `references/current-task-business-status-selection-v1.schema.json`. Treat
+`references/receipt-candidate-v1.schema.json`. For current-task `business_status` or
+`general_knowledge`, also read `references/current-task-business-status-selection-v1.schema.json`
+or `references/current-task-general-knowledge-selection-v1.schema.json`, respectively. Treat
 their outcomes, gate order, receipt routes, candidate fields, enum values, trigger IDs, exclusion
 rules, approval boundaries, and stop conditions as authoritative. The Company MCP remains
 authoritative for identity, capabilities, source/target registries, validation, idempotency, audit,
@@ -69,6 +70,11 @@ publication, and index state.
   `knowledge_owner_upn`; those fields belong to the server-owned current-task route. The test marker
   or business object ID belongs in `business_object_id`. It must not ask for an HTTPS link merely
   because the evidence is the current Codex task.
+- For `general_knowledge` selected from the current Codex task, construct only the bounded
+  `CurrentTaskGeneralKnowledgeSelectionV1` fields and pass them as the
+  `current_task_general_knowledge` tool argument. The same source, revision, evidence and owner
+  fields are server-owned. Do not invent a source locator or request an HTTPS link for current-task
+  evidence.
 - Construct one `ReceiptCandidateV1` from the selected bounded evidence using only the fields,
   required sets, formats, and enum values in `references/receipt-candidate-v1.schema.json`. Do not
   guess missing fields, source identifiers, locators, revisions, hashes, or evidence-manifest
@@ -88,8 +94,9 @@ that exact intent or selection is already present.
 
 If the Skill materially changes the content, evidence, exclusions, receipt type, target, owner, or
 correction chain after the employee's request or selection, show the revised candidate and obtain a
-new exact selection before prepare. Then call `prepare_knowledge_submission` once with either
-`candidate` or `current_task_business_status`, never both. Do not automatically retry, switch
+new exact selection before prepare. Then call `prepare_knowledge_submission` once with exactly one
+of `candidate`, `current_task_business_status`, or `current_task_general_knowledge`. Do not
+automatically retry, switch
 sources, broaden evidence, or prepare other candidates. If blocked, present safe field errors and
 return to assessment; do not weaken a gate. If ready, show all of:
 

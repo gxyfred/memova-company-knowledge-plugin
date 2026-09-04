@@ -1,4 +1,4 @@
-# 发给员工 Codex 的固定安装／升级话术（0.4.5）
+# 发给员工 Codex 的固定安装／升级话术（0.4.6）
 
 请帮我安装或升级 Memova“公司知识助手”Plugin，并完成首次登录前置检查。我的这条请求明确
 授权你执行下面列出的 Marketplace、Plugin 和专用 MCP 登录命令；Microsoft 登录页面必须由我
@@ -12,7 +12,7 @@
    这个公开仓库可匿名读取，不检查或要求 GitHub 登录。
 2. 安装或刷新 Plugin：
    `codex plugin add memova-company-knowledge@memova-company-knowledge-pilot`
-3. 只读验证 Plugin 已安装、已启用且版本至少为 `0.4.5`，并确认专用 MCP 名称为
+3. 只读验证 Plugin 已安装、已启用且版本至少为 `0.4.6`，并确认专用 MCP 名称为
    `company_knowledge_assistant`。不要修改或删除其他 Plugin、Marketplace 或 Codex 设置。
 4. 运行 `codex mcp list` 并只检查 `company_knowledge_assistant`：
    - 如果是 `Not logged in`，运行

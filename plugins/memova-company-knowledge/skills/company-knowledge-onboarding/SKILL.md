@@ -79,9 +79,12 @@ the employee OAuth path.
 1. Confirm the contract's seven receipt types and required MCP tool surface. A local declaration is
    package readiness, not proof of a live backend binding; mark a live check `not_run` rather than
    claiming success when no server response exists.
-2. Run one synthetic, non-sensitive `answer` probe. Preserve server citations, conflicts, gaps,
-   policy version, and snapshot labels. A changing fact is only an as-of snapshot unless its cited
-   evidence proves a current observation.
+2. Read `answer_probe` from the machine contract. Generate one fresh UUID v4 and substitute it into
+   the exact `question_template`; send only that resulting identifier as the question with the
+   frozen time scope, filters, and selected IDs. Do not add explanatory words or choose a company
+   question. Pass only when the response exactly preserves the expected insufficient-evidence
+   status, empty citations/conflicts, gap reason, freshness labels, and a non-empty MCP
+   `policy_version`. This probe is a transport/contract canary, not a company-fact evaluation.
 3. Verify that `search`, `fetch`, `prepare_knowledge_submission`,
    `submit_knowledge_candidate`, and `get_publication_status` are present. Do not call write tools
    merely to prove that they exist.
@@ -93,7 +96,13 @@ the employee OAuth path.
   approved evidence, expected ephemeral effect, 30-minute expiry, and absence of a Published item.
   Obtain explicit user approval for that exact remote action.
 - Use only synthetic non-sensitive `general_knowledge` content unless the user separately approves
-  another evidence item and receipt type. Do not upload or copy real company secrets into a test.
+  another evidence item and receipt type. For the synthetic rehearsal, call
+  `prepare_knowledge_submission` with only the `current_task_general_knowledge` input defined by
+  `preview_cancel_rehearsal`; generate fresh valid request/task/selection identifiers and supply the
+  bounded synthetic topic, claim, applicability, observation time and selection reason. Never
+  provide or invent `source_locator`, source identity, revision, evidence hash, immutable locator,
+  or knowledge-owner identity: the server derives them from the authenticated employee and bounded
+  current-task selection. Do not upload or copy real company secrets into a test.
 - Present the returned target, normalized payload, exclusions, warnings, capability decision,
   policy version, and expiry. For a cancel rehearsal, discard the preview and do **not** call
   `submit_knowledge_candidate`; cancellation means allowing the preview to expire.
