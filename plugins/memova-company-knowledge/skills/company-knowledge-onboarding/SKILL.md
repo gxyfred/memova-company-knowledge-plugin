@@ -79,10 +79,11 @@ the employee OAuth path.
 1. Confirm the contract's seven receipt types and required MCP tool surface. A local declaration is
    package readiness, not proof of a live backend binding; mark a live check `not_run` rather than
    claiming success when no server response exists.
-2. Read `answer_probe` from the machine contract. Generate one fresh UUID v4 and substitute it into
-   the exact `question_template`; send only that resulting identifier as the question with the
-   frozen time scope, filters, and selected IDs. Do not add explanatory words or choose a company
-   question. Pass only when the response exactly preserves the expected insufficient-evidence
+2. Read `answer_probe` from the machine contract. Call `answer` exactly once with its exact frozen
+   question, pre-platform `as_of` time scope, filters, and selected IDs. The temporal boundary is
+   the deterministic empty-snapshot invariant; do not replace it with random text, a current-time
+   query, or a company question that can retrieve semantic nearest neighbors. Pass only when the
+   response exactly preserves the expected insufficient-evidence
    status, empty citations/conflicts, gap reason, freshness labels, and a non-empty MCP
    `policy_version`. This probe is a transport/contract canary, not a company-fact evaluation.
 3. Verify that `search`, `fetch`, `prepare_knowledge_submission`,

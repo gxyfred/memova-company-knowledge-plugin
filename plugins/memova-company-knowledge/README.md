@@ -50,8 +50,8 @@ call; only the complete server preview receives the single final publication con
 hash, request identity, audit, delegated ownership, fail-closed validation and no-auto-publish
 protections remain unchanged.
 
-Version `0.4.6` makes onboarding checks deterministic. The read-only answer probe uses a fresh,
-unpublished UUID and receives the effective policy version on the MCP result. Synthetic preview
+Version `0.4.7` makes onboarding checks deterministic. The read-only answer probe uses a frozen
+pre-platform empty-snapshot boundary and receives the effective policy version on the MCP result. Synthetic preview
 cancellation and ordinary current-task `general_knowledge` now use a typed server-owned route that
 derives source locator, revision, evidence anchors, hashes and owner without an employee-provided
 HTTPS URL.
@@ -62,7 +62,7 @@ Chenchen may normally query without submitting by choice.
 
 The repository-level [employee operations](../../docs/employee-operations.md) and
 [administrator operations](../../docs/admin-operations.md) guides define the S10-04 usage and
-release boundaries. The current manifest is `0.4.6`; OAuth behavior remains unchanged from
+release boundaries. The current manifest is `0.4.7`; OAuth behavior remains unchanged from
 `0.4.1`, current-task status and general-knowledge provenance remain server-owned, submit identity
 stays bound to the prepared candidate, and only the final server preview requires a publication
 confirmation.
