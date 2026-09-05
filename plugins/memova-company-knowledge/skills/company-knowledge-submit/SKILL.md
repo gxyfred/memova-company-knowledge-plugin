@@ -119,7 +119,7 @@ for confirmation and requires a new exact employee request or candidate selectio
   `preview_payload_sha256`, and `user_confirmed: true`. The service resolves the original
   `client_request_id` from that authenticated employee-owned preview. Do not copy, generate, or
   replace a request ID at submit time. Plugin 0.4.7 clients may still send the legacy field for
-  backward compatibility, but the server ignores it and 0.4.8 must omit it. Never resend or reconstruct the candidate
+  backward compatibility, but the server ignores it and 0.4.8 and newer must omit it. Never resend or reconstruct the candidate
   payload at submit time.
 - A successful call directly creates Published Knowledge plus an immutable SubmissionReceipt; no
   Draft or human review queue follows. Report `knowledge_id`, `receipt_id`, Published target URL,

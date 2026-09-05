@@ -69,7 +69,10 @@ Chenchen may normally query without submitting by choice.
 
 The repository-level [employee operations](../../docs/employee-operations.md) and
 [administrator operations](../../docs/admin-operations.md) guides define the S10-04 usage and
-release boundaries. The current manifest is `0.4.8`; OAuth bootstrap remains unchanged from
+release boundaries. Version `0.4.9` removes the redundant employee identity reconfirmation: the
+delegated Microsoft token and active employee-directory resolution are authoritative, while the
+safe UPN/display name is shown only for transparency and server-detected mismatch still fails
+closed. The current manifest is `0.4.9`; OAuth bootstrap remains unchanged from
 `0.4.1`, current-task status and general-knowledge provenance remain server-owned, submit identity
 stays bound to the prepared candidate, and only the final server preview requires a publication
 confirmation.

@@ -1,6 +1,6 @@
 {
   "name": "memova-company-knowledge",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "description": "Onboard to, query, and explicitly submit Memova's internal company knowledge with server-enforced identity, access control, provenance, and freshness.",
   "author": {
     "name": "Memova",

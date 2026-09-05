@@ -67,11 +67,14 @@ Run this before evaluating gates because the host can hide protected tools befor
 
 ## Employee readiness — default, read-only
 
-1. Verify Plugin `0.4.8` or newer, a fresh conversation, and the exact seven tool names. Presence
+1. Verify Plugin `0.4.9` or newer, a fresh conversation, and the exact seven tool names. Presence
    is checked without calling write tools.
-2. Call `get_profile` once. Show only safe fields needed for the employee to confirm the signed-in
-   identity is their own. Stop on mismatch. Job assignments are explanatory only; explicit current
-   capabilities are authoritative and employees remain equal participants regardless of title.
+2. Call `get_profile` once. Treat the delegated Microsoft token plus the server's active employee
+   directory resolution as authoritative. Show the safe UPN/display name for transparency, but do
+   not ask the employee to reconfirm their identity. Fail closed if the server rejects the token,
+   tenant, employee mapping, or identity match. Job assignments are explanatory only; explicit
+   current capabilities are authoritative and employees remain equal participants regardless of
+   title.
 3. Confirm all seven frozen receipt types are declared. Do not overclaim live support from local
    files alone.
 4. Call `answer` once with the exact `answer_probe` question, pre-platform `as_of`, filters, and
