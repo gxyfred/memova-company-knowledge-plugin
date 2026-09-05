@@ -12,12 +12,16 @@ facts.
 
 ## Query workflow
 
-1. Treat the user's natural-language question as the query. Employees may ask across job functions;
-   position, department, manager, responsibilities, and prior contribution types are never search
-   filters or authorization inputs.
-2. For a normal question, call the MCP `answer` tool. Preserve the active conversation and parent
-   answer identifiers for a genuine follow-up when the tool supports them. Do not treat conversation
-   history as evidence.
+1. Treat the user's natural-language question as the query. Pass the employee's current question to
+   `answer.question` unchanged, apart from removing the explicit Plugin invocation label and
+   surrounding whitespace. Do not rewrite, expand, translate, summarize, add likely evidence terms,
+   or append code/test/deployment assumptions. Query interpretation and expansion are server-owned.
+   Employees may ask across job functions; position, department, manager, responsibilities, and
+   prior contribution types are never search filters or authorization inputs.
+2. For a normal question, call the MCP `answer` tool. Send `conversation_id` and `parent_answer_id`
+   only together as a valid pair from the same active Company MCP conversation. If either identifier
+   is unavailable, omit both. Do not fabricate either identifier, retry an orphan parent, or treat
+   conversation history as evidence.
 3. Use MCP `search` only when the user asks to inspect results, compare sources, or narrow a scope.
    Use MCP `fetch` to read an exact returned knowledge item or revision. Never invent IDs, client
    ACLs, employee IDs, role claims, source registrations, or hidden/debug filters.
