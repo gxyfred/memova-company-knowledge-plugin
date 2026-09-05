@@ -1,13 +1,13 @@
 {
   "name": "memova-company-knowledge",
-  "version": "0.4.10",
+  "version": "0.4.11",
   "description": "Onboard to, query, and explicitly submit Memova's internal company knowledge with server-enforced identity, access control, provenance, and freshness.",
   "author": {
     "name": "Memova",
     "url": "https://memova.ai"
   },
   "homepage": "https://memova.ai",
-  "repository": "https://github.com/gxyfred/memova-company-knowledge-plugin",
+  "repository": "https://github.com/Memova-ai/memova-company-knowledge-plugin",
   "license": "UNLICENSED",
   "keywords": [
     "memova",
@@ -32,8 +32,6 @@
     "brandColor": "#3366FF",
     "defaultPrompt": [
       "查询公司知识库并给出带来源的答案。",
-      "说明这个结论的证据、适用范围和最后一次有效快照。",
-      "对比相关知识中的冲突、限制和未知项。",
       "开始公司知识助手入职自检。",
       "@公司知识助手 检查当前任务是否产生了应进入公司公共知识库的新事实、决定、状态、更正或可复用方法。"
     ]

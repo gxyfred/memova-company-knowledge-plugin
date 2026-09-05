@@ -79,7 +79,7 @@ query Skill no longer expands a question with guessed code, test, deployment, or
 and it sends conversation/parent identifiers only as a valid pair. The server classifies natural
 completion and ETA wording, keeps business status additive to delivery facets, and uses inferred
 receipt routes as evidence priorities instead of destructive search filters. The current manifest
-is `0.4.10`; OAuth bootstrap remains unchanged from
+is `0.4.11`, which also restores the three supported starter prompts and the official repository link; OAuth bootstrap remains unchanged from
 `0.4.1`, current-task status and general-knowledge provenance remain server-owned, submit identity
 stays bound to the prepared candidate, and only the final server preview requires a publication
 confirmation.
